@@ -1,4 +1,4 @@
-export const getLandingPageHtml = (uptimeSeconds) => {
+export const getLandingPageHtml = (uptimeSeconds, dbConnected = false) => {
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -162,8 +162,14 @@ export const getLandingPageHtml = (uptimeSeconds) => {
                 <div class="row-value">1.0.0</div>
             </div>
             <div class="row">
-                <div class="row-label">Status</div>
+                <div class="row-label">Server Status</div>
                 <div class="row-value" style="color: var(--text-main); font-weight: 500;">Healthy</div>
+            </div>
+            <div class="row">
+                <div class="row-label">Database Status</div>
+                <div class="row-value" style="color: ${dbConnected ? 'var(--text-main)' : '#ff0000'}; font-weight: 500;">
+                    ${dbConnected ? 'Connected' : 'Disconnected'}
+                </div>
             </div>
             <div class="row">
                 <div class="row-label">Uptime</div>

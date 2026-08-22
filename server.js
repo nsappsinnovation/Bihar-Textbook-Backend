@@ -1,7 +1,8 @@
 import express from "express";
 import pinoHttp from "pino-http";
-import { printBox, startSpinner, printSuccess } from "./src/utils/terminal.js";
+import { printBox, startSpinner, printSuccess, printError, printDbStatus } from "./src/utils/terminal.js";
 import { getLandingPageHtml } from "./src/utils/landingPage.js";
+import { connectDB } from "./src/config/db.js";
 import chalk from "chalk";
 import env from "./src/config/env.js";
 
@@ -25,20 +26,33 @@ app.use(
   }),
 );
 
+let isDbConnected = false;
+
 // Routes
 app.get("/", (req, res) => {
   const uptimeSeconds = process.uptime();
-  res.send(getLandingPageHtml(uptimeSeconds));
+  res.send(getLandingPageHtml(uptimeSeconds, isDbConnected));
 });
 
 // Start a spinner while the server is initializing
 const spinner = startSpinner("Initializing system components...");
 
-// Simulate a slight delay to show the spinner
-setTimeout(() => {
+const startServer = async () => {
+  // 1. Connect to Database
+  spinner.text = chalk.gray("Connecting to MySQL Database...");
+  isDbConnected = await connectDB();
+  
+  spinner.stop();
+  printDbStatus(isDbConnected);
+
+  // 2. Abort if Database fails
+  if (!isDbConnected) {
+    printError("Server startup aborted due to database connection failure.");
+    process.exit(1);
+  }
+
+  // 3. Start Express Server
   app.listen(PORT, () => {
-    // Stop the spinner and show success
-    spinner.stop();
     printSuccess("System initialization complete");
 
     // Draw the stylized box with server info
@@ -52,4 +66,6 @@ setTimeout(() => {
         `${chalk.gray("Local Network:")}   ${hostText}`,
     );
   });
-}, 500);
+};
+
+startServer();

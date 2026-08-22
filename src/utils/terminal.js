@@ -52,3 +52,15 @@ export const printError = (message) => {
 export const printInfo = (message) => {
   console.log('\n' + chalk.bgBlue.black(' INFO ') + ' ' + chalk.white(message));
 };
+
+/**
+ * Print database connection status
+ * @param {boolean} isConnected - Whether the DB is connected
+ */
+export const printDbStatus = (isConnected) => {
+  if (isConnected) {
+    console.log('\n' + chalk.bgGreen.black(' DB ') + ' ' + chalk.white('MySQL Database Connected Successfully'));
+  } else {
+    console.log('\n' + chalk.bgRed.black(' DB ') + ' ' + chalk.white('Failed to Connect to MySQL Database'));
+  }
+};
