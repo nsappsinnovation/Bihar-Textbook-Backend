@@ -1,5 +1,7 @@
 # Bihar Text Book Publication Backend
 
+**WARNING: This is a strictly confidential project. If you are not an authorized contributor or part of this project, please leave this repository immediately.**
+
 This is the backend server for the Bihar Text Book Publication project. It is built using Node.js and Express. The project focuses on having a clean architecture, robust environment variable validation, and a professional terminal and web interface.
 
 ## Architecture and Utility Files
