@@ -1,0 +1,190 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id            Int       @id @default(autoincrement()) /// Unique ID for each admin
+  fullName      String    @map("full_name") @db.VarChar(200) /// From Settings > Profile tab
+  email         String    @unique @db.VarChar(255) /// Login email + shown in profile
+  phone         String?   @db.VarChar(20) /// Contact number from profile
+  passwordHash  String    @map("password_hash") @db.VarChar(255) /// Hashed password — NEVER store plain text
+  avatarUrl     String?   @map("avatar_url") @db.VarChar(500) /// Profile picture URL (uploaded via Settings)
+  isActive      Boolean   @default(true) @map("is_active") /// Soft disable without deleting
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  books         Book[]
+  notices       Notice[]
+  sections      Section[]
+  settings      Setting[]
+
+  @@map("admins")
+}
+
+enum BookStatus {
+  Published
+  Draft
+}
+
+model Book {
+  id            Int       @id @default(autoincrement()) /// Unique book ID
+  title         String    @db.VarChar(255) /// Book name, e.g. "Physics Bhag 1"
+  classId       Int       @map("class_id") @db.TinyInt /// Class number: 1 to 12
+  subject       String?   @default("General") @db.VarChar(100) /// Subject like Mathematics, Hindi, Physics
+  coverImageUrl String?   @map("cover_image_url") @db.VarChar(500) /// URL to the book cover image
+  description   String?   @db.Text /// Detailed book description shown on the site
+  status        BookStatus @default(Draft) /// Published = visible on website, Draft = hidden
+  sortOrder     Int?      @default(0) @map("sort_order") /// Controls display ordering
+  createdById   Int?      @map("created_by") /// Which admin added this book
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  createdBy     Admin?    @relation(fields: [createdById], references: [id])
+  chapters      BookChapter[]
+
+  @@map("books")
+}
+
+model BookChapter {
+  id            Int       @id @default(autoincrement()) /// Unique chapter ID
+  bookId        Int       @map("book_id") /// Which book this chapter belongs to
+  chapterNumber Int       @map("chapter_number") /// Chapter 1, 2, 3... for ordering
+  title         String?   @db.VarChar(255) /// English title, e.g. "Motion and Force"
+  pdfUrl        String?   @map("pdf_url") @db.VarChar(500) /// Direct link to chapter PDF file
+  sortOrder     Int?      @default(0) @map("sort_order") /// Display order within the book
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  book          Book      @relation(fields: [bookId], references: [id])
+
+  @@map("book_chapters")
+}
+
+enum NoticeType {
+  Notice
+  Tender
+}
+
+model Notice {
+  id            Int       @id @default(autoincrement()) /// Unique notice/tender ID
+  title         String    @db.VarChar(500) /// Notice or tender heading
+  description   String?   @db.Text /// Full content/body
+  type          NoticeType @default(Notice) /// This tells notices apart from tenders — same table, different type!
+  category      String?   @db.VarChar(100) /// Notices: Recruitment, Financial, etc. Tenders: Active, E-Tender, etc.
+  isPinned      Boolean?  @default(false) @map("is_pinned") /// Pinned ones always appear at the top
+  documentUrl   String?   @map("document_url") @db.VarChar(500) /// Attached PDF document URL
+  publishDate   DateTime? @db.Date @map("publish_date") /// When this was published
+  createdById   Int?      @map("created_by") /// Admin who created it
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  createdBy     Admin?    @relation(fields: [createdById], references: [id])
+
+  @@map("notices")
+}
+
+enum PersonType {
+  leader
+  board_member
+  officer
+  past_md
+}
+
+model Person {
+  id            Int       @id @default(autoincrement()) /// Unique person ID
+  type          PersonType /// What kind of person — decides which admin page shows them
+  name          String    @db.VarChar(255) /// Full name, e.g. "Shri Yatendra Kumar Pal, IAS"
+  designation   String?   @db.VarChar(255) /// Role, e.g. "Managing Director"
+  department    String?   @db.VarChar(200) /// Used for officers, e.g. "Finance"
+  tag           String?   @db.VarChar(50) /// Used for leaders: LEADERSHIP, VISIONARIES, EDUCATORS
+  email         String?   @db.VarChar(255) /// Only for officers — contact email
+  phone         String?   @db.VarChar(50) /// Only for officers — contact phone
+  photoUrl      String?   @map("photo_url") @db.VarChar(500) /// Portrait photo URL
+  tenureFrom    String?   @map("tenure_from") @db.VarChar(50) /// Only for past_md — start date
+  tenureTo      String?   @map("tenure_to") @db.VarChar(50) /// Only for past_md — end date
+  status        String?   @default("Active") @db.VarChar(50) /// Active or Inactive
+  sortOrder     Int?      @default(0) @map("sort_order") /// Controls display order
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@map("people")
+}
+
+enum EmployeeType {
+  Regular
+  Contract
+  Outsource
+}
+
+model Employee {
+  id            Int       @id @default(autoincrement()) /// Unique row ID
+  name          String    @db.VarChar(255) /// Full name
+  designation   String?   @db.VarChar(200) /// Job title, e.g. "Computer Operator"
+  department    String?   @db.VarChar(200) /// Department, e.g. "Accounts", "Sales"
+  type          EmployeeType @default(Regular) /// Employment type
+  isActive      Boolean?  @default(true) @map("is_active") /// Soft-delete by marking inactive
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@map("employees")
+}
+
+model Section {
+  id            Int       @id @default(autoincrement()) /// Unique item ID
+  module        String    @db.VarChar(50) /// Which section: initiatives, tools_resources, gallery_photo, gallery_video, gallery_press, reg_forms
+  title         String    @db.VarChar(500) /// Item title or heading
+  description   String?   @db.Text /// Short description or tagline
+  content       String?   @db.Text /// Detailed body text (used by Initiatives)
+  category      String?   @db.VarChar(100) /// Sub-category like "Launch" for videos, "HR" for forms
+  imageUrl      String?   @map("image_url") @db.VarChar(500) /// Thumbnail, cover photo, or gallery image
+  videoUrl      String?   @map("video_url") @db.VarChar(500) /// YouTube URL — only when module = gallery_video
+  documentUrl   String?   @map("document_url") @db.VarChar(500) /// Attached PDF — only for registration forms
+  fileType      String?   @map("file_type") @db.VarChar(20) /// PDF, DOCX — only for registration forms
+  link          String?   @db.VarChar(500) /// Navigation link like /vr — only for initiatives
+  publishDate   DateTime? @db.Date @map("publish_date") /// Publication date — mainly for press releases
+  sortOrder     Int?      @default(0) @map("sort_order") /// Controls display order
+  createdById   Int?      @map("created_by") /// Admin who added this
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  createdBy     Admin?    @relation(fields: [createdById], references: [id])
+
+  @@map("sections")
+}
+
+model Message {
+  id            Int       @id @default(autoincrement()) /// Unique message ID
+  senderName    String    @map("sender_name") @db.VarChar(255) /// Who sent this message
+  senderEmail   String?   @map("sender_email") @db.VarChar(255) /// Sender email for replies
+  subject       String?   @db.VarChar(500) /// Message subject line
+  preview       String?   @db.Text /// Short preview shown in inbox list
+  body          String?   @db.Text /// Full message content
+  isRead        Boolean?  @default(false) @map("is_read") /// Unread = blue dot
+  isStarred     Boolean?  @default(false) @map("is_starred") /// Starred = gold star
+  isArchived    Boolean?  @default(false) @map("is_archived") /// Hidden from inbox
+  repliedAt     DateTime? @map("replied_at") /// When admin replied (NULL if not replied)
+  createdAt     DateTime  @default(now()) @map("created_at") /// When message was received
+
+  @@map("messages")
+}
+
+model Setting {
+  id            Int       @id @default(autoincrement()) /// Unique row ID
+  settingKey    String    @unique @map("setting_key") @db.VarChar(100) /// Key like "rti_officer", "csr_policy", "site_name"
+  settingValue  String?   @map("setting_value") @db.LongText /// The value — plain text or JSON string for complex data
+  category      String?   @db.VarChar(50) /// Groups related settings: system, rti, md_message, csr_policy, printers
+  updatedById   Int?      @map("updated_by") /// Which admin last changed this
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  updatedBy     Admin?    @relation(fields: [updatedById], references: [id])
+
+  @@map("settings")
+}

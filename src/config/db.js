@@ -1,29 +1,19 @@
-import mysql from 'mysql2/promise';
-import env from './env.js';
+import { PrismaClient } from '../generated/prisma/index.js';
+import logger from '../utils/logger.js';
 
-let pool;
+// Create a single instance of PrismaClient
+const prisma = new PrismaClient();
 
 export const connectDB = async () => {
   try {
-    // Aiven and other cloud providers append ?ssl-mode=REQUIRED which mysql2 doesn't parse natively.
-    // We strip it and manually provide the required SSL configuration object.
-    const cleanUrl = env.DATABASE_URL.replace('?ssl-mode=REQUIRED', '');
-    
-    pool = mysql.createPool({
-      uri: cleanUrl,
-      ssl: {
-        rejectUnauthorized: false // Required for Aiven cloud connections without a local CA cert
-      }
-    });
-
-    // Test the connection
-    const connection = await pool.getConnection();
-    connection.release();
+    await prisma.$connect();
+    logger.info("Database connected successfully via Prisma.");
     return true; // Successfully connected
   } catch (error) {
-    console.error('Database connection error details:', error);
+    logger.error({ err: error }, 'Database connection error details');
     return false; // Connection failed
   }
 };
 
-export const getDB = () => pool;
+export const getDB = () => prisma;
+export default prisma;
