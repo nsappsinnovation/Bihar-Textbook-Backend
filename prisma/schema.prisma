@@ -40,6 +40,7 @@ model Book {
   title         String    @db.VarChar(255) /// Book name, e.g. "Physics Bhag 1"
   classId       Int       @map("class_id") @db.TinyInt /// Class number: 1 to 12
   subject       String?   @default("General") @db.VarChar(100) /// Subject like Mathematics, Hindi, Physics
+  board         String?   @default("Bihar Board") @db.VarChar(200) /// Board/Publisher name
   coverImageUrl String?   @map("cover_image_url") @db.VarChar(500) /// URL to the book cover image
   description   String?   @db.Text /// Detailed book description shown on the site
   status        BookStatus @default(Draft) /// Published = visible on website, Draft = hidden

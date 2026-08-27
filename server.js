@@ -14,6 +14,7 @@ import swaggerSpec from "./src/config/swagger.js";
 
 // Import Routes
 import authRoutes from "./src/routes/authRoutes.js";
+import bookRoutes from "./src/routes/bookRoutes.js";
 
 const app = express();
 const PORT = env.PORT;
@@ -49,6 +50,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 app.use("/api/auth", authRoutes);
+app.use("/api", bookRoutes);
 
 
 app.use(errorHandler);
