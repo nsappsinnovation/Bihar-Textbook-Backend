@@ -138,6 +138,38 @@ export const getLandingPageHtml = (uptimeSeconds, dbConnected = false) => {
         .docs-link:hover {
             color: var(--text-muted);
         }
+
+        .guide-box {
+            margin-top: 32px;
+            padding: 24px;
+            background: var(--hover-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .guide-box h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .guide-steps {
+            list-style-position: inside;
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .guide-steps li {
+            margin-bottom: 12px;
+        }
+
+        .guide-steps li:last-child {
+            margin-bottom: 0;
+        }
     </style>
 </head>
 <body>
@@ -175,6 +207,22 @@ export const getLandingPageHtml = (uptimeSeconds, dbConnected = false) => {
                 <div class="row-label">Uptime</div>
                 <div class="row-value" id="uptime">Loading...</div>
             </div>
+        </div>
+
+        <div class="guide-box">
+            <h2>API Testing Guide</h2>
+            <ol class="guide-steps">
+                <li>Click <strong>View API Documentation</strong> below to open Swagger.</li>
+                <li>Scroll down to the <strong>Auth</strong> section and open <code>POST /api/auth/login</code>.</li>
+                <li>Click <strong>Try it out</strong> and log in with:<br>
+                    <span style="display: inline-block; margin-top: 8px;">
+                        Email: <code style="background: #eaeaea; padding: 2px 6px; border-radius: 4px; color: #000;">admin@example.com</code><br>
+                        Password: <code style="background: #eaeaea; padding: 2px 6px; border-radius: 4px; color: #000;">password123</code>
+                    </span>
+                </li>
+                <li>Click <strong>Execute</strong>. Swagger will securely save your login cookie.</li>
+                <li>Scroll up to the <strong>Books</strong> and <strong>Chapters</strong> sections, read the instructions, and start testing!</li>
+            </ol>
         </div>
 
         <div class="footer">
