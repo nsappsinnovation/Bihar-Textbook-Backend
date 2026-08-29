@@ -158,6 +158,94 @@ export const getLandingPageHtml = (uptimeSeconds, dbConnected = false) => {
         .do-not-do ul {
             margin-bottom: 0;
         }
+
+        .grid {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 48px;
+            background: var(--bg-color);
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.15s ease;
+        }
+
+        .row:last-child {
+            border-bottom: none;
+        }
+
+        .row:hover {
+            background: var(--hover-bg);
+        }
+
+        .row-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .row-value {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .dark-guide-box {
+            margin-top: 24px;
+            margin-bottom: 48px;
+            padding: 24px;
+            background: #000000;
+            color: #ffffff;
+            border-radius: 8px;
+        }
+
+        .dark-guide-box h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #333333;
+            color: #ffffff;
+        }
+
+        .dark-guide-steps {
+            list-style-position: inside;
+            color: #a1a1aa;
+            font-size: 15px;
+            line-height: 1.6;
+            padding-left: 0;
+        }
+
+        .dark-guide-steps li {
+            margin-bottom: 12px;
+        }
+
+        .dark-guide-steps li:last-child {
+            margin-bottom: 0;
+        }
+
+        .dark-guide-steps strong {
+            color: #ffffff;
+        }
+
+        .dark-code {
+            background: #333333;
+            color: #ffffff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 13px;
+            border: 1px solid #444444;
+        }
     </style>
 </head>
 <body>
@@ -171,9 +259,56 @@ export const getLandingPageHtml = (uptimeSeconds, dbConnected = false) => {
 
     <main>
         <h1>Backend Development Guide</h1>
-        <p class="lead">Standard operating procedures for creating new APIs within this repository.</p>
+        <p class="lead" style="margin-bottom: 24px;">Standard operating procedures for creating new APIs within this repository.</p>
 
-        <a href="/api-docs" class="button">View Swagger API Documentation</a>
+        <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 12px 16px; margin-bottom: 32px; border-radius: 4px;">
+            <p style="color: #b91c1c; margin: 0; font-size: 14px; font-weight: 500;">
+                <strong>WARNING:</strong> This documentation is for authorized personnel only. Outsiders must leave this page immediately.
+            </p>
+        </div>
+
+        <div class="grid">
+            <div class="row">
+                <div class="row-label">Environment</div>
+                <div class="row-value">Development</div>
+            </div>
+            <div class="row">
+                <div class="row-label">Version</div>
+                <div class="row-value">1.0.0</div>
+            </div>
+            <div class="row">
+                <div class="row-label">Server Status</div>
+                <div class="row-value" style="color: var(--text-main); font-weight: 500;">Healthy</div>
+            </div>
+            <div class="row">
+                <div class="row-label">Database Status</div>
+                <div class="row-value" style="color: ${dbConnected ? 'var(--text-main)' : '#ff0000'}; font-weight: 500;">
+                    ${dbConnected ? 'Connected' : 'Disconnected'}
+                </div>
+            </div>
+            <div class="row">
+                <div class="row-label">Uptime</div>
+                <div class="row-value" id="uptime">Loading...</div>
+            </div>
+        </div>
+
+        <a href="/api-docs" class="button" style="margin-bottom: 24px;">View Swagger API Documentation</a>
+
+        <div class="dark-guide-box">
+            <h2>Swagger Testing Guide</h2>
+            <ol class="dark-guide-steps">
+                <li>Click <strong>View Swagger API Documentation</strong> above to open Swagger.</li>
+                <li>Scroll down to the <strong>Auth</strong> section and open <code>POST /api/auth/login</code>.</li>
+                <li>Click <strong>Try it out</strong> and log in with the test credentials:<br>
+                    <span style="display: inline-block; margin-top: 8px;">
+                        Email: <span class="dark-code">admin@example.com</span><br>
+                        Password: <span class="dark-code">password123</span>
+                    </span>
+                </li>
+                <li>Click <strong>Execute</strong>. Swagger will securely save your login cookie.</li>
+                <li>Scroll up to the <strong>Books</strong> and <strong>Chapters</strong> sections, read the instructions, and start testing!</li>
+            </ol>
+        </div>
 
         <h2>Architecture Overview</h2>
         <p>This backend utilizes the Express.js framework integrated with Prisma ORM. The structure is separated by concerns. When building a new feature, interaction is required with three main layers: Routes, Controllers, and Validators.</p>
@@ -282,6 +417,28 @@ export default router;</code></pre>
         </div>
 
     </main>
+
+    <script>
+        let uptime = ${Math.floor(uptimeSeconds)};
+        
+        const updateUptime = () => {
+            const h = Math.floor(uptime / 3600);
+            const m = Math.floor((uptime % 3600) / 60);
+            const s = uptime % 60;
+            
+            const pad = (num) => num.toString().padStart(2, '0');
+            const uptimeEl = document.getElementById('uptime');
+            if (uptimeEl) {
+                uptimeEl.textContent = \`\${h}:\${pad(m)}:\${pad(s)}\`;
+            }
+        };
+
+        updateUptime();
+        setInterval(() => {
+            uptime++;
+            updateUptime();
+        }, 1000);
+    </script>
 </body>
 </html>
   `;
