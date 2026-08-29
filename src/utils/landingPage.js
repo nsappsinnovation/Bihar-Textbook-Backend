@@ -246,6 +246,47 @@ export const getLandingPageHtml = (uptimeSeconds, dbConnected = false) => {
             font-size: 13px;
             border: 1px solid #444444;
         }
+
+        .pipeline {
+            margin-top: 24px;
+            margin-bottom: 40px;
+            border-left: 2px solid var(--border-color);
+            padding-left: 24px;
+            margin-left: 8px;
+        }
+        
+        .pipeline-step {
+            position: relative;
+            margin-bottom: 24px;
+        }
+        
+        .pipeline-step:last-child {
+            margin-bottom: 0;
+        }
+        
+        .pipeline-step::before {
+            content: '';
+            position: absolute;
+            left: -31px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #000;
+            border: 2px solid #fff;
+        }
+
+        .pipeline-title {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .pipeline-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
     </style>
 </head>
 <body>
@@ -310,14 +351,35 @@ export const getLandingPageHtml = (uptimeSeconds, dbConnected = false) => {
             </ol>
         </div>
 
-        <h2>Architecture Overview</h2>
-        <p>This backend utilizes the Express.js framework integrated with Prisma ORM. The structure is separated by concerns. When building a new feature, interaction is required with three main layers: Routes, Controllers, and Validators.</p>
-        
-        <ul>
-            <li><code>src/routes/</code>: Defines the URL paths and attaches middleware.</li>
-            <li><code>src/validators/</code>: Defines the validation rules for incoming request bodies or queries.</li>
-            <li><code>src/controllers/</code>: Contains the actual business logic and database interactions.</li>
-        </ul>
+        <h2>Architecture Overview (The Data Pipeline)</h2>
+        <p style="margin-bottom: 16px;">This backend utilizes the Express.js framework integrated with Prisma ORM. Before writing code, you must understand how data travels through our files. Do not skip any of these steps:</p>
+
+        <div class="pipeline">
+            <div class="pipeline-step">
+                <div class="pipeline-title">1. Client Request</div>
+                <div class="pipeline-desc">A browser, mobile app, or Swagger sends an HTTP Request.</div>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-title">2. Routes <code>(src/routes/)</code></div>
+                <div class="pipeline-desc">The router catches the URL and passes it to the correct middleware.</div>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-title">3. Validators <code>(src/validators/)</code></div>
+                <div class="pipeline-desc">Ensures the incoming data is safe and properly formatted before proceeding.</div>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-title">4. Controllers <code>(src/controllers/)</code></div>
+                <div class="pipeline-desc">Executes the core business logic. This is where the heavy lifting happens.</div>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-title">5. Prisma <code>(src/config/db.js)</code></div>
+                <div class="pipeline-desc">Talks to the MySQL Database to fetch or save the data safely.</div>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-title">6. Response</div>
+                <div class="pipeline-desc">A standard JSON response is sent back to the client.</div>
+            </div>
+        </div>
 
         <h2>Step-by-Step API Creation</h2>
 
