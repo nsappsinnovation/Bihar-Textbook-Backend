@@ -2,6 +2,8 @@ import express from "express";
 import pinoHttp from "pino-http";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import morgan from "morgan";
+import compression from "compression";
 import { printBox, startSpinner, printSuccess, printError, printDbStatus } from "./src/utils/terminal.js";
 import { getLandingPageHtml } from "./src/utils/landingPage.js";
 import { connectDB } from "./src/config/db.js";
@@ -34,6 +36,10 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+// Compress all responses
+app.use(compression());
+
+app.use(morgan("dev"));
 
 app.use(pinoHttp({ logger }));
 

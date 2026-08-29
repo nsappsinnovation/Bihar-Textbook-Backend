@@ -61,15 +61,11 @@ export const updateBookValidator = [
   body("subject")
     .optional()
     .trim()
-    .notEmpty()
-    .withMessage("Subject cannot be empty")
     .isLength({ max: 100 })
     .withMessage("Subject cannot exceed 100 characters"),
   body("board")
     .optional()
     .trim()
-    .notEmpty()
-    .withMessage("Board cannot be empty")
     .isLength({ max: 200 })
     .withMessage("Board cannot exceed 200 characters"),
   body("coverImageUrl")

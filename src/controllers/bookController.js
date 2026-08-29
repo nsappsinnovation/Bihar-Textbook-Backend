@@ -4,7 +4,7 @@ import logger from "../utils/logger.js";
 // GET /api/books
 export const getBooks = async (req, res) => {
   try {
-    const { classId, subject, status } = req.query;
+    const { classId, subject, status, page = 1, limit = 10 } = req.query;
 
     const where = {};
     if (classId) {
@@ -19,17 +19,26 @@ export const getBooks = async (req, res) => {
       where.status = status;
     }
 
-    const books = await prisma.book.findMany({
-      where,
-      include: {
-        _count: {
-          select: { chapters: true },
+    const pageNum = parseInt(page, 10) || 1;
+    const limitNum = parseInt(limit, 10) || 10;
+    const skip = (pageNum - 1) * limitNum;
+
+    const [books, totalItems] = await Promise.all([
+      prisma.book.findMany({
+        where,
+        skip,
+        take: limitNum,
+        include: {
+          _count: {
+            select: { chapters: true },
+          },
         },
-      },
-      orderBy: {
-        sortOrder: "asc",
-      },
-    });
+        orderBy: {
+          sortOrder: "asc",
+        },
+      }),
+      prisma.book.count({ where }),
+    ]);
 
     // Map database properties to match frontend expected schema
     const mappedBooks = books.map((book) => ({
@@ -38,9 +47,17 @@ export const getBooks = async (req, res) => {
       chapterCount: book._count.chapters,
     }));
 
+    const totalPages = Math.ceil(totalItems / limitNum);
+
     return res.status(200).json({
       success: true,
       data: mappedBooks,
+      pagination: {
+        totalItems,
+        totalPages,
+        currentPage: pageNum,
+        itemsPerPage: limitNum,
+      },
     });
   } catch (error) {
     logger.error({ err: error }, "Error fetching books");
@@ -197,11 +214,6 @@ export const deleteBook = async (req, res) => {
         message: "Book not found",
       });
     }
-
-    // Cascade delete chapters in transaction/sequentially to prevent foreign key errors
-    await prisma.bookChapter.deleteMany({
-      where: { bookId: id },
-    });
 
     await prisma.book.delete({
       where: { id },

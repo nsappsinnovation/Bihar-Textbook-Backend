@@ -64,7 +64,7 @@ model BookChapter {
   sortOrder     Int?      @default(0) @map("sort_order") /// Display order within the book
   createdAt     DateTime  @default(now()) @map("created_at")
 
-  book          Book      @relation(fields: [bookId], references: [id])
+  book          Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
 
   @@map("book_chapters")
 }
