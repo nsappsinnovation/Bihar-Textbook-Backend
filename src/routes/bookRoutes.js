@@ -25,73 +25,55 @@ const router = express.Router();
  * @swagger
  * tags:
  *   - name: Books
- *     description: Books management and catalog endpoints
+ *     description: Testing endpoints for Books (CRUD operations)
  *   - name: Chapters
- *     description: Book chapters management and lookup endpoints
+ *     description: Testing endpoints for Book Chapters
  */
 
 /**
  * @swagger
  * /api/books:
  *   get:
- *     summary: Retrieve all books
- *     description: Fetches a list of all textbooks. Can be filtered by class ID, subject, and status.
+ *     summary: 1. Get all Books (with Pagination)
+ *     description: |
+ *       **For Testers:** Use this endpoint to see the list of all books. 
+ *       
+ *       **How to test:**
+ *       1. Click **Try it out**.
+ *       2. Scroll down and click **Execute** to see all books.
+ *       3. To test pagination, type `1` in the `page` box and `5` in the `limit` box. You should only get 5 books back!
+ *       4. To test filtering, type `10` in the `classId` box to see only Class 10 books.
  *     tags: [Books]
  *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number (e.g., 1)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Number of books per page (e.g., 10)
  *       - in: query
  *         name: classId
  *         schema:
  *           type: integer
- *         description: Filter books by school class (e.g. 1 to 12)
+ *         description: Filter by class (e.g., 10)
  *       - in: query
  *         name: subject
  *         schema:
  *           type: string
- *         description: Filter books by subject (e.g. math, hindi, english)
+ *         description: Filter by subject (e.g., Science)
  *       - in: query
  *         name: status
  *         schema:
  *           type: string
  *           enum: [Published, Draft]
- *         description: Filter by publication status
+ *         description: Filter by status
  *     responses:
  *       200:
- *         description: A list of books
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                       title:
- *                         type: string
- *                       classId:
- *                         type: integer
- *                       subject:
- *                         type: string
- *                       board:
- *                         type: string
- *                       coverImageUrl:
- *                         type: string
- *                       image:
- *                         type: string
- *                       description:
- *                         type: string
- *                       status:
- *                         type: string
- *                       sortOrder:
- *                         type: integer
- *                       chapterCount:
- *                         type: integer
+ *         description: Successfully fetched the books.
  */
 router.get("/books", getBooks);
 
@@ -99,8 +81,15 @@ router.get("/books", getBooks);
  * @swagger
  * /api/books/{id}:
  *   get:
- *     summary: Get book details by ID
- *     description: Fetches a single book with all its chapters ordered.
+ *     summary: 2. Get a single Book's details
+ *     description: |
+ *       **For Testers:** Use this to view the full details of ONE specific book, including all its chapters!
+ *       
+ *       **How to test:**
+ *       1. Find an ID from the GET /api/books response above.
+ *       2. Click **Try it out** here.
+ *       3. Enter that ID into the `id` box.
+ *       4. Click **Execute**. You should see the book details and an array of its chapters inside the response.
  *     tags: [Books]
  *     parameters:
  *       - in: path
@@ -108,21 +97,12 @@ router.get("/books", getBooks);
  *         required: true
  *         schema:
  *           type: integer
- *         description: The unique book ID
+ *         description: The unique ID of the book
  *     responses:
  *       200:
- *         description: Book details with chapters list
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 data:
- *                   type: object
+ *         description: Successfully fetched the book.
  *       404:
- *         description: Book not found
+ *         description: Book not found.
  */
 router.get("/books/:id", getBookById);
 
@@ -130,8 +110,16 @@ router.get("/books/:id", getBookById);
  * @swagger
  * /api/books:
  *   post:
- *     summary: Create a new book
- *     description: Inserts a new book into the database. Protected route (Admin only).
+ *     summary: 3. Create a new Book (Requires Login)
+ *     description: |
+ *       **For Testers:** Use this to add a brand new book to the database. 
+ *       *Note: You must be logged in as an admin for this to work!*
+ *       
+ *       **How to test:**
+ *       1. Click **Try it out**.
+ *       2. In the Request body, change the JSON text. Make sure you provide at least a `title` (e.g., "Math Magic") and a `classId` (e.g., 5).
+ *       3. Click **Execute**.
+ *       4. If you get a 401 error, it means you aren't logged in. Go to the Auth endpoints and log in first!
  *     tags: [Books]
  *     security:
  *       - cookieAuth: []
@@ -144,6 +132,68 @@ router.get("/books/:id", getBookById);
  *             required:
  *               - title
  *               - classId
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: "Math Magic Vol 1"
+ *               classId:
+ *                 type: integer
+ *                 example: 5
+ *               subject:
+ *                 type: string
+ *                 example: "Mathematics"
+ *               board:
+ *                 type: string
+ *                 example: "Bihar Board"
+ *               coverImageUrl:
+ *                 type: string
+ *                 example: "https://example.com/cover.jpg"
+ *               description:
+ *                 type: string
+ *                 example: "A great book for learning math."
+ *               status:
+ *                 type: string
+ *                 enum: [Published, Draft]
+ *                 example: "Published"
+ *               sortOrder:
+ *                 type: integer
+ *                 example: 1
+ *     responses:
+ *       201:
+ *         description: Book created successfully.
+ *       400:
+ *         description: Validation error (e.g., missing title).
+ */
+router.post("/books", authenticate, createBookValidator, validateRequest, createBook);
+
+/**
+ * @swagger
+ * /api/books/{id}:
+ *   put:
+ *     summary: 4. Update an existing Book (Requires Login)
+ *     description: |
+ *       **For Testers:** Use this to change information about a book.
+ *       
+ *       **How to test:**
+ *       1. Click **Try it out**.
+ *       2. Enter a valid Book ID in the `id` box.
+ *       3. In the Request body, you can delete lines you don't want to update. Try updating just the `title`.
+ *       4. Click **Execute** and check if the title changed!
+ *     tags: [Books]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
  *             properties:
  *               title:
  *                 type: string
@@ -163,41 +213,8 @@ router.get("/books/:id", getBookById);
  *               sortOrder:
  *                 type: integer
  *     responses:
- *       201:
- *         description: Book created successfully
- *       401:
- *         description: Unauthorized
- *       400:
- *         description: Validation failed
- */
-router.post("/books", authenticate, createBookValidator, validateRequest, createBook);
-
-/**
- * @swagger
- * /api/books/{id}:
- *   put:
- *     summary: Update an existing book
- *     description: Modifies book properties. Protected route (Admin only).
- *     tags: [Books]
- *     security:
- *       - cookieAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *     responses:
  *       200:
- *         description: Book updated successfully
- *       404:
- *         description: Book not found
+ *         description: Book updated successfully.
  */
 router.put("/books/:id", authenticate, updateBookValidator, validateRequest, updateBook);
 
@@ -205,8 +222,15 @@ router.put("/books/:id", authenticate, updateBookValidator, validateRequest, upd
  * @swagger
  * /api/books/{id}:
  *   delete:
- *     summary: Delete a book
- *     description: Deletes a book and all its associated chapters. Protected route (Admin only).
+ *     summary: 5. Delete a Book (Requires Login)
+ *     description: |
+ *       **For Testers:** Use this to completely delete a book. 
+ *       **Magic Trick:** Because of "Cascade Deletion", if you delete a book, ALL of its chapters will also be automatically deleted from the database!
+ *       
+ *       **How to test:**
+ *       1. Create a dummy book using the POST endpoint, and remember its ID.
+ *       2. Click **Try it out** here and enter that ID.
+ *       3. Click **Execute**. The book should be gone!
  *     tags: [Books]
  *     security:
  *       - cookieAuth: []
@@ -218,9 +242,7 @@ router.put("/books/:id", authenticate, updateBookValidator, validateRequest, upd
  *           type: integer
  *     responses:
  *       200:
- *         description: Book and chapters deleted successfully
- *       404:
- *         description: Book not found
+ *         description: Book deleted successfully.
  */
 router.delete("/books/:id", authenticate, deleteBook);
 
@@ -228,8 +250,14 @@ router.delete("/books/:id", authenticate, deleteBook);
  * @swagger
  * /api/books/{id}/chapters:
  *   get:
- *     summary: List chapters for a book
- *     description: Retrieves all chapters for a specific book, ordered by chapter number / sort order.
+ *     summary: 6. Get all Chapters for a Book
+ *     description: |
+ *       **For Testers:** Use this to see all the chapters that belong to a specific book.
+ *       
+ *       **How to test:**
+ *       1. Click **Try it out**.
+ *       2. Enter a valid Book ID.
+ *       3. Click **Execute** to see the list of its chapters.
  *     tags: [Chapters]
  *     parameters:
  *       - in: path
@@ -239,9 +267,7 @@ router.delete("/books/:id", authenticate, deleteBook);
  *           type: integer
  *     responses:
  *       200:
- *         description: List of chapters
- *       404:
- *         description: Book not found
+ *         description: Successfully fetched the chapters.
  */
 router.get("/books/:id/chapters", getChapters);
 
@@ -249,8 +275,16 @@ router.get("/books/:id/chapters", getChapters);
  * @swagger
  * /api/books/{id}/chapters:
  *   post:
- *     summary: Create a new chapter for a book
- *     description: Appends a chapter to the specified book. Protected route (Admin only).
+ *     summary: 7. Add a Chapter to a Book (Requires Login)
+ *     description: |
+ *       **For Testers:** Add a new chapter to an existing book.
+ *       
+ *       **How to test:**
+ *       1. Click **Try it out**.
+ *       2. Enter the Book ID in the path.
+ *       3. Enter `chapterNumber` (e.g., 1) and `title` (e.g., "Introduction") in the body.
+ *       4. Click **Execute**.
+ *       **Important Rule:** Try to add another chapter with the SAME `chapterNumber` to the same book. The server should reject it and give you an error! This is a great test case.
  *     tags: [Chapters]
  *     security:
  *       - cookieAuth: []
@@ -260,6 +294,7 @@ router.get("/books/:id/chapters", getChapters);
  *         required: true
  *         schema:
  *           type: integer
+ *           description: The ID of the Book you are adding a chapter to.
  *     requestBody:
  *       required: true
  *       content:
@@ -272,17 +307,19 @@ router.get("/books/:id/chapters", getChapters);
  *             properties:
  *               chapterNumber:
  *                 type: integer
+ *                 example: 1
  *               title:
  *                 type: string
+ *                 example: "Chapter 1: The Beginning"
  *               pdfUrl:
  *                 type: string
+ *                 example: "https://example.com/chapter1.pdf"
  *               sortOrder:
  *                 type: integer
+ *                 example: 1
  *     responses:
  *       201:
- *         description: Chapter created successfully
- *       409:
- *         description: Chapter number already exists for this book
+ *         description: Chapter created.
  */
 router.post("/books/:id/chapters", authenticate, createChapterValidator, validateRequest, createChapter);
 
@@ -290,8 +327,14 @@ router.post("/books/:id/chapters", authenticate, createChapterValidator, validat
  * @swagger
  * /api/chapters/{id}:
  *   put:
- *     summary: Update an existing chapter
- *     description: Modifies an existing chapter. Protected route (Admin only).
+ *     summary: 8. Update a Chapter (Requires Login)
+ *     description: |
+ *       **For Testers:** Change the title, PDF link, or number of a specific chapter.
+ *       
+ *       **How to test:**
+ *       1. Click **Try it out**.
+ *       2. Enter the **Chapter ID** (NOT the Book ID) in the path.
+ *       3. Change the title in the body and hit **Execute**.
  *     tags: [Chapters]
  *     security:
  *       - cookieAuth: []
@@ -301,17 +344,25 @@ router.post("/books/:id/chapters", authenticate, createChapterValidator, validat
  *         required: true
  *         schema:
  *           type: integer
+ *           description: The unique ID of the CHAPTER
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             properties:
+ *               chapterNumber:
+ *                 type: integer
+ *               title:
+ *                 type: string
+ *               pdfUrl:
+ *                 type: string
+ *               sortOrder:
+ *                 type: integer
  *     responses:
  *       200:
- *         description: Chapter updated successfully
- *       404:
- *         description: Chapter not found
+ *         description: Chapter updated.
  */
 router.put("/chapters/:id", authenticate, updateChapterValidator, validateRequest, updateChapter);
 
@@ -319,8 +370,14 @@ router.put("/chapters/:id", authenticate, updateChapterValidator, validateReques
  * @swagger
  * /api/chapters/{id}:
  *   delete:
- *     summary: Delete a chapter
- *     description: Deletes a chapter by its ID. Protected route (Admin only).
+ *     summary: 9. Delete a Chapter (Requires Login)
+ *     description: |
+ *       **For Testers:** Delete a single chapter from the database.
+ *       
+ *       **How to test:**
+ *       1. Click **Try it out**.
+ *       2. Enter the Chapter ID.
+ *       3. Click **Execute**. The chapter will be removed!
  *     tags: [Chapters]
  *     security:
  *       - cookieAuth: []
@@ -330,11 +387,10 @@ router.put("/chapters/:id", authenticate, updateChapterValidator, validateReques
  *         required: true
  *         schema:
  *           type: integer
+ *           description: The unique ID of the CHAPTER
  *     responses:
  *       200:
- *         description: Chapter deleted successfully
- *       404:
- *         description: Chapter not found
+ *         description: Chapter deleted.
  */
 router.delete("/chapters/:id", authenticate, deleteChapter);
 
