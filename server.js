@@ -19,6 +19,7 @@ import { handleUploadError, UPLOADS_DIRECTORY } from "./src/middlewares/uploads.
 import authRoutes from "./src/routes/authRoutes.js";
 import bookRoutes from "./src/routes/bookRoutes.js";
 import noticeRoutes from "./src/routes/noticeRoutes.js";
+// import employees from "./src/routes/employeesRoutes.js"
 
 const app = express();
 const PORT = env.PORT;
@@ -44,8 +45,8 @@ app.use(compression());
 app.use(morgan("dev"));
 
 app.use(pinoHttp({ logger }));
-
 app.use("/uploads", express.static(UPLOADS_DIRECTORY));
+
 let isDbConnected = false;
 
 
@@ -60,12 +61,13 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use("/api/auth", authRoutes);
 app.use("/api", bookRoutes);
-
 app.use("/api/notices", noticeRoutes);
+// app.use("/api/employee", employees)
 
-app.use(errorHandler);
 
 app.use(handleUploadError);
+app.use(errorHandler);
+
 
 
 const spinner = startSpinner("Initializing system components...");
