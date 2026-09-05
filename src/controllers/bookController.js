@@ -426,3 +426,46 @@ export const deleteChapter = async (req, res) => {
     });
   }
 };
+
+// GET /api/books/class/:classId
+export const getBooksByClass = async (req, res) => {
+  try {
+    const classId = parseInt(req.params.classId, 10);
+
+    if (isNaN(classId) || classId < 1 || classId > 12) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Class ID. Must be an integer between 1 and 12",
+      });
+    }
+
+    const books = await prisma.book.findMany({
+      where: { classId },
+      include: {
+        _count: {
+          select: { chapters: true },
+        },
+      },
+      orderBy: {
+        sortOrder: "asc",
+      },
+    });
+
+    const mappedBooks = books.map((book) => ({
+      ...book,
+      image: book.coverImageUrl || "/bookcover.png",
+      chapterCount: book._count.chapters,
+    }));
+
+    return res.status(200).json({
+      success: true,
+      data: mappedBooks,
+    });
+  } catch (error) {
+    logger.error({ err: error, classId: req.params.classId }, "Error fetching books by class");
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error while fetching books by class",
+    });
+  }
+};

@@ -1,4 +1,5 @@
 import express from "express";
+import path from "node:path";
 import pinoHttp from "pino-http";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -19,6 +20,9 @@ import { handleUploadError, UPLOADS_DIRECTORY } from "./src/middlewares/uploads.
 import authRoutes from "./src/routes/authRoutes.js";
 import bookRoutes from "./src/routes/bookRoutes.js";
 import noticeRoutes from "./src/routes/noticeRoutes.js";
+import sectionRoutes from "./src/routes/sectionRoutes.js";
+import uploadRoutes from "./src/routes/uploadRoutes.js";
+import settingRoutes from "./src/routes/settingRoutes.js";
 // import employees from "./src/routes/employeesRoutes.js"
 
 const app = express();
@@ -45,7 +49,25 @@ app.use(compression());
 app.use(morgan("dev"));
 
 app.use(pinoHttp({ logger }));
+
+// Serve static uploaded files with full compatibility for /uploads, /api/uploads, and singular/plural routes
 app.use("/uploads", express.static(UPLOADS_DIRECTORY));
+app.use("/api/uploads", express.static(UPLOADS_DIRECTORY));
+
+app.use("/uploads/images", express.static(path.resolve(UPLOADS_DIRECTORY, "images")));
+app.use("/api/uploads/images", express.static(path.resolve(UPLOADS_DIRECTORY, "images")));
+app.use("/uploads/image", express.static(path.resolve(UPLOADS_DIRECTORY, "images")));
+app.use("/api/uploads/image", express.static(path.resolve(UPLOADS_DIRECTORY, "images")));
+
+app.use("/uploads/documents", express.static(path.resolve(UPLOADS_DIRECTORY, "documents")));
+app.use("/api/uploads/documents", express.static(path.resolve(UPLOADS_DIRECTORY, "documents")));
+app.use("/uploads/document", express.static(path.resolve(UPLOADS_DIRECTORY, "documents")));
+app.use("/api/uploads/document", express.static(path.resolve(UPLOADS_DIRECTORY, "documents")));
+
+app.use("/uploads/videos", express.static(path.resolve(UPLOADS_DIRECTORY, "videos")));
+app.use("/api/uploads/videos", express.static(path.resolve(UPLOADS_DIRECTORY, "videos")));
+app.use("/uploads/video", express.static(path.resolve(UPLOADS_DIRECTORY, "videos")));
+app.use("/api/uploads/video", express.static(path.resolve(UPLOADS_DIRECTORY, "videos")));
 
 let isDbConnected = false;
 
@@ -62,6 +84,9 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/auth", authRoutes);
 app.use("/api", bookRoutes);
 app.use("/api/notices", noticeRoutes);
+app.use("/api", sectionRoutes);
+app.use("/api", uploadRoutes);
+app.use("/api", settingRoutes);
 // app.use("/api/employee", employees)
 
 

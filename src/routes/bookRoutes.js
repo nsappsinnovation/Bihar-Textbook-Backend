@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getBooks,
+  getBooksByClass,
   getBookById,
   createBook,
   updateBook,
@@ -76,6 +77,37 @@ const router = express.Router();
  *         description: Successfully fetched the books.
  */
 router.get("/books", getBooks);
+
+/**
+ * @swagger
+ * /api/books/class/{classId}:
+ *   get:
+ *     summary: Get books by Class ID
+ *     description: Returns all textbooks belonging to a specific class (1-12).
+ *     tags: [Books]
+ *     parameters:
+ *       - in: path
+ *         name: classId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The class level (1 to 12)
+ *     responses:
+ *       200:
+ *         description: Successfully fetched the books for the specified class.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *       400:
+ *         description: Invalid Class ID
+ */
+router.get("/books/class/:classId", getBooksByClass);
 
 /**
  * @swagger
