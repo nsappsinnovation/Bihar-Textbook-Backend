@@ -186,3 +186,24 @@ model Setting {
 
   @@map("settings")
 }
+
+model Directory {
+  id          Int      @id @default(autoincrement())
+  type        String   @db.VarChar(50)
+  name        String   @db.VarChar(255)
+  designation String?  @db.VarChar(255)
+  department  String?  @db.VarChar(200)
+  tag         String?  @db.VarChar(50)
+  email       String?  @db.VarChar(255)
+  phone       String?  @db.VarChar(50)
+  photoUrl    String?  @map("photo_url") @db.VarChar(500)
+  tenureFrom  String?  @map("tenure_from") @db.VarChar(50)
+  tenureTo    String?  @map("tenure_to") @db.VarChar(50)
+  status      String?  @default("Active") @db.VarChar(20)
+  sortOrder   Int?     @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([type])
+  @@map("directory")
+}
