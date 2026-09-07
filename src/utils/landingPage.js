@@ -347,8 +347,46 @@ export const getLandingPageHtml = (uptimeSeconds, dbConnected = false) => {
                     </span>
                 </li>
                 <li>Click <strong>Execute</strong>. Swagger will securely save your login cookie.</li>
-                <li>Scroll up to the <strong>Books</strong> and <strong>Chapters</strong> sections, read the instructions, and start testing!</li>
+                <li>Scroll through the <strong>Books</strong>, <strong>Chapters</strong>, <strong>Notices</strong>, <strong>Generic Sections &amp; Gallery</strong>, <strong>Settings &amp; Registry</strong>, <strong>Uploads</strong>, and <strong>Directory</strong> sections, read the instructions, and start testing!</li>
             </ol>
+        </div>
+
+        <h2>API Modules</h2>
+        <p style="margin-bottom: 16px;">The backend currently exposes 40 endpoints across the following modules. Full request and response details are in the Swagger documentation.</p>
+
+        <div class="grid">
+            <div class="row">
+                <div class="row-label">Auth</div>
+                <div class="row-value"><code>/api/auth</code> &middot; 5 endpoints</div>
+            </div>
+            <div class="row">
+                <div class="row-label">Books</div>
+                <div class="row-value"><code>/api/books</code> &middot; 6 endpoints</div>
+            </div>
+            <div class="row">
+                <div class="row-label">Chapters</div>
+                <div class="row-value"><code>/api/books/:id/chapters</code>, <code>/api/chapters/:id</code> &middot; 4 endpoints</div>
+            </div>
+            <div class="row">
+                <div class="row-label">Notices</div>
+                <div class="row-value"><code>/api/notices</code> &middot; 5 endpoints &middot; docs pending (issue #10)</div>
+            </div>
+            <div class="row">
+                <div class="row-label">Generic Sections &amp; Gallery</div>
+                <div class="row-value"><code>/api/sections</code>, <code>/api/admin/sections</code> &middot; 6 endpoints</div>
+            </div>
+            <div class="row">
+                <div class="row-label">Settings &amp; Registry</div>
+                <div class="row-value"><code>/api/settings</code>, <code>/api/admin/settings</code> &middot; 5 endpoints</div>
+            </div>
+            <div class="row">
+                <div class="row-label">Uploads</div>
+                <div class="row-value"><code>/api/uploads</code> &middot; 4 endpoints</div>
+            </div>
+            <div class="row">
+                <div class="row-label">Directory</div>
+                <div class="row-value"><code>/api/getDirectory/:type</code>, <code>/api/admin/*DirectoryRow/:type</code> &middot; 5 endpoints &middot; docs pending (issue #10)</div>
+            </div>
         </div>
 
         <h2>Architecture Overview (The Data Pipeline)</h2>
