@@ -275,7 +275,7 @@ export const getChapters = async (req, res) => {
 export const createChapter = async (req, res) => {
   try {
     const bookId = parseInt(req.params.id, 10);
-    const { chapterNumber, title, pdfUrl, sortOrder } = req.body;
+    const { chapterNumber, title, hindiTitle, pdfUrl, sortOrder } = req.body;
 
     const book = await prisma.book.findUnique({
       where: { id: bookId },
@@ -308,6 +308,7 @@ export const createChapter = async (req, res) => {
         bookId,
         chapterNumber: parseInt(chapterNumber, 10),
         title,
+        hindiTitle: hindiTitle || null,
         pdfUrl: pdfUrl || null,
         sortOrder: sortOrder !== undefined ? parseInt(sortOrder, 10) : 0,
       },
@@ -333,7 +334,7 @@ export const createChapter = async (req, res) => {
 export const updateChapter = async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const { chapterNumber, title, pdfUrl, sortOrder } = req.body;
+    const { chapterNumber, title, hindiTitle, pdfUrl, sortOrder } = req.body;
 
     const existingChapter = await prisma.bookChapter.findUnique({
       where: { id },
@@ -368,6 +369,7 @@ export const updateChapter = async (req, res) => {
     }
 
     if (title !== undefined) updateData.title = title;
+    if (hindiTitle !== undefined) updateData.hindiTitle = hindiTitle;
     if (pdfUrl !== undefined) updateData.pdfUrl = pdfUrl;
     if (sortOrder !== undefined) updateData.sortOrder = parseInt(sortOrder, 10);
 

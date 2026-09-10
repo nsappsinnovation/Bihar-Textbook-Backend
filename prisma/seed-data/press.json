@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "date": "October 15, 2025",
+    "title": "Launch of Digital Learning Initiatives Across 500 Schools",
+    "excerpt": "The State Text Book Publishing Corporation today announced a major rollout of VR and AR educational tools, aiming to modernize learning infrastructure in rural districts.",
+    "category": "Initiatives",
+    "fileSize": "1.2 MB",
+    "cardStyle": "gradient",
+    "image": "/images/hero/classroom.webp"
+  },
+  {
+    "id": 2,
+    "date": "September 28, 2025",
+    "title": "New Curriculum Guidelines Released for Upcoming Academic Year",
+    "excerpt": "Updated guidelines emphasize regional history, environmental awareness, and foundational literacy skills. All textbooks have been revised accordingly.",
+    "category": "Curriculum",
+    "fileSize": "4.5 MB",
+    "cardStyle": "image",
+    "image": "/images/hero/audio.webp"
+  },
+  {
+    "id": 3,
+    "date": "August 10, 2025",
+    "title": "Partnership Announced with National Digital Library",
+    "excerpt": "To expand access to supplementary reading materials across remote districts, a strategic partnership has been formalized.",
+    "category": "Partnerships",
+    "fileSize": "800 KB",
+    "cardStyle": "glass",
+    "image": "/images/hero/vr.webp"
+  }
+]

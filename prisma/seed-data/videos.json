@@ -1,0 +1,20 @@
+[
+  {
+    "type": "video",
+    "src": "/images/hero/classroom.webp",
+    "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "alt": "Bihar Digital Classrooms Launch Highlights"
+  },
+  {
+    "type": "video",
+    "src": "/images/hero/audio.webp",
+    "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "alt": "Rural Literacy Outreach & Community Distribution Drives"
+  },
+  {
+    "type": "video",
+    "src": "/images/hero/vr.webp",
+    "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "alt": "Teacher Training Workshop on Interactive Smart Textbooks"
+  }
+]

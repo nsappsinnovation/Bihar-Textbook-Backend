@@ -1,4 +1,5 @@
 import { body, query, param } from "express-validator";
+import { isUrlOrPath } from "./common.js";
 
 export const ALLOWED_SECTION_MODULES = [
   "opmp",
@@ -8,6 +9,7 @@ export const ALLOWED_SECTION_MODULES = [
   "gl-press",
   "dc-reg-forms",
   "csr",
+  "cl",
 ];
 
 export const getSectionsQueryValidator = [
@@ -44,6 +46,8 @@ export const createSectionValidator = [
   body("description").optional().isString().trim(),
   body("content").optional().isString().trim(),
   body("category").optional().isString().trim().isLength({ max: 100 }),
+  body("imageUrl").optional({ checkFalsy: true }).trim().custom(isUrlOrPath).isLength({ max: 500 }),
+  body("documentUrl").optional({ checkFalsy: true }).trim().custom(isUrlOrPath).isLength({ max: 500 }),
   body("videoUrl").optional().isString().trim().isLength({ max: 500 }),
   body("link").optional().isString().trim().isLength({ max: 500 }),
   body("fileType").optional().isString().trim().isLength({ max: 20 }),
@@ -71,6 +75,8 @@ export const updateSectionValidator = [
   body("description").optional().isString().trim(),
   body("content").optional().isString().trim(),
   body("category").optional().isString().trim().isLength({ max: 100 }),
+  body("imageUrl").optional({ checkFalsy: true }).trim().custom(isUrlOrPath).isLength({ max: 500 }),
+  body("documentUrl").optional({ checkFalsy: true }).trim().custom(isUrlOrPath).isLength({ max: 500 }),
   body("videoUrl").optional().isString().trim().isLength({ max: 500 }),
   body("link").optional().isString().trim().isLength({ max: 500 }),
   body("fileType").optional().isString().trim().isLength({ max: 20 }),

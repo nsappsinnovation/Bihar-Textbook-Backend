@@ -30,8 +30,8 @@ const parseSettingValue = (value) => {
  */
 const removeLocalFile = async (fileUrl) => {
   if (!fileUrl || typeof fileUrl !== "string" || !fileUrl.startsWith("/uploads/")) return;
-  const filename = path.basename(fileUrl);
-  const filepath = path.resolve(UPLOADS_DIRECTORY, filename);
+  const relativePath = fileUrl.slice("/uploads/".length);
+  const filepath = path.resolve(UPLOADS_DIRECTORY, relativePath);
   if (!filepath.startsWith(`${UPLOADS_DIRECTORY}${path.sep}`)) return;
 
   try {
@@ -54,10 +54,11 @@ export const getSettings = async (req, res, next) => {
     const where = {};
 
     if (keys) {
+      // Only public keys can be read through this public endpoint
       const keysList = keys
         .split(",")
         .map((k) => k.trim())
-        .filter(Boolean);
+        .filter((k) => PUBLIC_ALLOWED_SETTING_KEYS.includes(k));
       where.settingKey = { in: keysList };
     } else {
       // By default, restrict public queries to explicitly allowed public setting keys
@@ -106,10 +107,13 @@ export const getSettingByKey = async (req, res, next) => {
   try {
     const { key } = req.params;
 
-    const setting = await prisma.setting.findUnique({
-      where: { settingKey: key },
-      include: { updatedBy: updatedBySelect },
-    });
+    // Non-public keys are treated as not found
+    const setting = PUBLIC_ALLOWED_SETTING_KEYS.includes(key)
+      ? await prisma.setting.findUnique({
+          where: { settingKey: key },
+          include: { updatedBy: updatedBySelect },
+        })
+      : null;
 
     if (!setting) {
       return res.status(404).json({
@@ -142,7 +146,7 @@ export const updateSettingByKey = async (req, res, next) => {
   try {
     const { key } = req.params;
     const { value, category } = req.body;
-    const updatedById = req.admin?.id || null;
+    const updatedById = req.user?.id || null;
 
     const stringifiedValue =
       typeof value === "object" && value !== null
@@ -199,7 +203,7 @@ export const uploadSettingFile = async (req, res, next) => {
     }
 
     const relativePath = `/uploads/documents/${file.filename}`;
-    const updatedById = req.admin?.id || null;
+    const updatedById = req.user?.id || null;
 
     const existingSetting = await prisma.setting.findUnique({
       where: { settingKey: key },
@@ -269,7 +273,7 @@ export const deleteSettingFile = async (req, res, next) => {
       where: { settingKey: key },
       data: {
         settingValue: null,
-        updatedById: req.admin?.id || null,
+        updatedById: req.user?.id || null,
       },
     });
 

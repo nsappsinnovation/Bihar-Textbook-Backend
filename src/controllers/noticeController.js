@@ -11,7 +11,7 @@ const createdBy = {
 const getLocalDocumentPath = (documentUrl) => {
   if (!documentUrl?.startsWith("/uploads/")) return null;
 
-  const filepath = path.resolve(UPLOADS_DIRECTORY, path.basename(documentUrl));
+  const filepath = path.resolve(UPLOADS_DIRECTORY, documentUrl.slice("/uploads/".length));
   return filepath.startsWith(`${UPLOADS_DIRECTORY}${path.sep}`)
     ? filepath
     : null;
@@ -30,8 +30,11 @@ const removeLocalDocument = async (documentUrl) => {
   }
 };
 
+// e.g. "/uploads/documents/123-abc.pdf"
 const getUploadedDocumentUrl = (file) =>
-  file ? `/uploads/${file.filename}` : undefined;
+  file
+    ? `/uploads/${path.relative(UPLOADS_DIRECTORY, file.path).split(path.sep).join("/")}`
+    : undefined;
 
 const toDate = (value) => (value ? new Date(`${value}T00:00:00.000Z`) : null);
 
@@ -42,7 +45,7 @@ export const getNotices = async (req, res) => {
     const pageNumber = Math.max(Number.parseInt(page, 10) || 1, 1);
     const pageSize = Math.min(
       Math.max(Number.parseInt(limit, 10) || 10, 1),
-      100,
+      1000,
     );
 
     if (type && !["Notice", "Tender"].includes(type)) {

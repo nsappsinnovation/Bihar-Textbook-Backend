@@ -1,6 +1,7 @@
 import { body, param } from "express-validator";
+import { isUrlOrPath } from "./common.js";
 
-const VALID_DIRECTORY_TYPES = ["leader", "board_member", "officer", "past_md"];
+const VALID_DIRECTORY_TYPES = ["leader", "board_member", "officer", "past_md", "employee"];
 
 // Shared param validators
 const typeParamCheck = param("type")
@@ -82,7 +83,7 @@ export const createDirectoryValidator = [
   body("photoUrl")
     .optional({ checkFalsy: true })
     .trim()
-    .isURL()
+    .custom(isUrlOrPath)
     .withMessage("Photo URL must be a valid URL")
     .isLength({ max: 500 })
     .withMessage("Photo URL cannot exceed 500 characters"),
@@ -162,7 +163,7 @@ export const updateDirectoryValidator = [
   body("photoUrl")
     .optional({ checkFalsy: true })
     .trim()
-    .isURL()
+    .custom(isUrlOrPath)
     .withMessage("Photo URL must be a valid URL")
     .isLength({ max: 500 })
     .withMessage("Photo URL cannot exceed 500 characters"),

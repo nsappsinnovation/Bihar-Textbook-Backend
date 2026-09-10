@@ -198,6 +198,43 @@ export const logout = async (req, res) => {
   }
 };
 
+// POST /api/auth/reset-password  (developer only — protected by requireDevKey)
+export const resetPassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const admin = await prisma.admin.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: "Admin with this email not found",
+      });
+    }
+
+    await prisma.admin.update({
+      where: { id: admin.id },
+      data: { passwordHash: await bcrypt.hash(newPassword, 12) },
+    });
+
+    logger.info({ adminId: admin.id }, "Admin password reset by developer");
+
+    return res.json({
+      success: true,
+      message: "Password reset successfully",
+    });
+  } catch (error) {
+    logger.error({ err: error }, "Reset password error");
+    return res.status(500).json({
+      success: false,
+      message: "Error resetting password",
+    });
+  }
+};
+
 // GET /api/auth/profile
 export const getProfile = async (req, res) => {
   try {

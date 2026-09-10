@@ -1,0 +1,32 @@
+[
+  {
+    "type": "image",
+    "src": "/images/hero/classroom.webp",
+    "alt": "Primary Classroom Learning Environment"
+  },
+  {
+    "type": "image",
+    "src": "/images/hero/audio.webp",
+    "alt": "E-Learning & Digital Books Portal"
+  },
+  {
+    "type": "image",
+    "src": "/images/hero/vr.webp",
+    "alt": "Mobile VR Lab Tour Experience"
+  },
+  {
+    "type": "image",
+    "src": "/images/hero/sign.webp",
+    "alt": "Inclusive Sign Language Training Class"
+  },
+  {
+    "type": "image",
+    "src": "/images/hero/linguistic.webp",
+    "alt": "Diverse Regional Dialects Learning Program"
+  },
+  {
+    "type": "image",
+    "src": "/images/hero/classroom.webp",
+    "alt": "Primary Classroom Learning Environment"
+  }
+]

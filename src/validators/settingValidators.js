@@ -6,6 +6,7 @@ export const PUBLIC_ALLOWED_SETTING_KEYS = [
   "csr_policy_content",
   "printer_registry_doc",
   "site_config",
+  "md_message",
 ];
 
 export const FILE_BACKED_SETTING_KEYS = [

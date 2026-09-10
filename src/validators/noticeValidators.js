@@ -1,4 +1,5 @@
 import { body } from "express-validator";
+import { isUrlOrPath } from "./common.js";
 
 const noticeFields = ({ requireTitle }) => [
   requireTitle
@@ -33,7 +34,7 @@ const noticeFields = ({ requireTitle }) => [
   body("documentUrl")
     .optional({ checkFalsy: true })
     .trim()
-    .isURL()
+    .custom(isUrlOrPath)
     .withMessage("Document URL must be a valid URL")
     .isLength({ max: 500 })
     .withMessage("Document URL cannot exceed 500 characters"),

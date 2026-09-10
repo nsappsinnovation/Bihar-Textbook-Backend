@@ -13,7 +13,8 @@ const env = cleanEnv(process.env, {
   NODE_ENV: str({ choices: ['development', 'test', 'production', 'staging'], default: 'development' }),
   PORT: port({ default: 3000 }),
   DATABASE_URL: url({ desc: 'MySQL connection string' }),
-  JWT_SECRET: str({ desc: 'Secret key for signing JWT tokens' })
+  JWT_SECRET: str({ desc: 'Secret key for signing JWT tokens' }),
+  DEV_API_KEY: str({ desc: 'Secret for developer-only endpoints (signup, reset-password)' })
 });
 
 export default env;

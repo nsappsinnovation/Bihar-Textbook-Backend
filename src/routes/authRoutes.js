@@ -6,13 +6,16 @@ import {
   logout,
   getProfile,
   me,
+  resetPassword,
 } from "../controllers/authController.js";
 import { authenticate } from "../middlewares/auth.js";
 import { loginRateLimiter } from "../middlewares/rateLimiter.js";
+import { requireDevKey } from "../middlewares/requireDevKey.js";
 import { validateRequest } from "../middlewares/validateRequest.js";
 import {
   signupValidator,
   loginValidator,
+  resetPasswordValidator,
 } from "../validators/authValidators.js";
 
 const router = express.Router();
@@ -48,8 +51,10 @@ const router = express.Router();
  * @swagger
  * /api/auth/signup:
  *   post:
- *     summary: Register a new admin
+ *     summary: Register a new admin (developer only — requires x-dev-key header)
  *     description: |
+ *       **Developer only.** Send the `x-dev-key` header with DEV_API_KEY from the backend .env; otherwise 403.
+ *
  *       Creates a new admin account in the database. The password is hashed with bcrypt (12 salt rounds) before storage.
  *
  *       **Frontend Integration:**
@@ -179,7 +184,44 @@ const router = express.Router();
  *       500:
  *         description: Internal server error. Log the error and show a generic "something went wrong" message to the user.
  */
-router.post("/signup", signupValidator, validateRequest, signup);
+router.post("/signup", requireDevKey, signupValidator, validateRequest, signup);
+
+/**
+ * @swagger
+ * /api/auth/reset-password:
+ *   post:
+ *     summary: Reset an admin's password (developer only)
+ *     description: Requires the `x-dev-key` header (DEV_API_KEY from the backend .env). Admins cannot call this.
+ *     tags: [Auth]
+ *     parameters:
+ *       - in: header
+ *         name: x-dev-key
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, newPassword]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: "admin@btbp.com"
+ *               newPassword:
+ *                 type: string
+ *                 example: "NewPass@123"
+ *     responses:
+ *       200:
+ *         description: Password reset
+ *       403:
+ *         description: Missing or wrong developer key
+ *       404:
+ *         description: Admin not found
+ */
+router.post("/reset-password", requireDevKey, resetPasswordValidator, validateRequest, resetPassword);
 
 /**
  * @swagger

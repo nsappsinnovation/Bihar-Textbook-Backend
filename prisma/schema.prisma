@@ -26,6 +26,7 @@ model Admin {
   sections               Section[]
   settings               Setting[]
   mdMessages             ManagingDirectorMessage[]
+  activities             ActivityLog[]
 
   @@map("admins")
 }
@@ -60,6 +61,7 @@ model BookChapter {
   bookId        Int      @map("book_id")
   chapterNumber Int      @map("chapter_number")
   title         String?  @db.VarChar(255)
+  hindiTitle    String?  @map("hindi_title") @db.VarChar(255)
   pdfUrl        String?  @map("pdf_url") @db.VarChar(500)
   sortOrder     Int?     @default(0) @map("sort_order")
   createdAt     DateTime @default(now()) @map("created_at")
@@ -206,4 +208,31 @@ model Directory {
 
   @@index([type])
   @@map("directory")
+}
+
+// Admin panel activity feed (Notifications page, navbar bell, dashboard)
+model ActivityLog {
+  id        Int      @id @default(autoincrement())
+  action    String   @db.VarChar(500)
+  type      String   @default("system") @db.VarChar(20)
+  isRead    Boolean  @default(false) @map("is_read")
+  adminId   Int?     @map("admin_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  admin Admin? @relation(fields: [adminId], references: [id], onDelete: SetNull)
+
+  @@map("activity_logs")
+}
+
+// Monthly textbook distribution vs target (dashboard chart, edited by admin)
+model BookDistribution {
+  id          Int      @id @default(autoincrement())
+  year        Int
+  month       Int      @db.TinyInt
+  distributed Int      @default(0)
+  target      Int      @default(0)
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([year, month])
+  @@map("book_distributions")
 }

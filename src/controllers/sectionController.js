@@ -16,10 +16,16 @@ const getLocalFilePath = (fileUrl) => {
   if (!fileUrl || typeof fileUrl !== "string" || !fileUrl.startsWith("/uploads/")) {
     return null;
   }
-  const filename = path.basename(fileUrl);
-  const filepath = path.resolve(UPLOADS_DIRECTORY, filename);
+  const relativePath = fileUrl.slice("/uploads/".length);
+  const filepath = path.resolve(UPLOADS_DIRECTORY, relativePath);
   return filepath.startsWith(`${UPLOADS_DIRECTORY}${path.sep}`) ? filepath : null;
 };
+
+/**
+ * Public URL for a file saved by multer, e.g. "/uploads/images/123-abc.webp"
+ */
+const toUploadUrl = (file) =>
+  `/uploads/${path.relative(UPLOADS_DIRECTORY, file.path).split(path.sep).join("/")}`;
 
 /**
  * Safely removes a local file from disk
@@ -195,6 +201,8 @@ export const createSection = async (req, res, next) => {
       description,
       content,
       category,
+      imageUrl: imageUrlBody,
+      documentUrl: documentUrlBody,
       videoUrl: videoUrlBody,
       link,
       fileType,
@@ -202,12 +210,13 @@ export const createSection = async (req, res, next) => {
       sortOrder,
     } = req.body;
 
+    // An uploaded file wins; otherwise use a URL sent in the body (e.g. from POST /api/uploads/*)
     const files = req.files || {};
-    const imageUrl = files.image?.[0] ? `/uploads/${files.image[0].filename}` : null;
-    const documentUrl = files.document?.[0] ? `/uploads/${files.document[0].filename}` : null;
-    const videoUrl = files.video?.[0] ? `/uploads/${files.video[0].filename}` : (videoUrlBody || null);
+    const imageUrl = files.image?.[0] ? toUploadUrl(files.image[0]) : (imageUrlBody || null);
+    const documentUrl = files.document?.[0] ? toUploadUrl(files.document[0]) : (documentUrlBody || null);
+    const videoUrl = files.video?.[0] ? toUploadUrl(files.video[0]) : (videoUrlBody || null);
 
-    const createdById = req.admin?.id || null;
+    const createdById = req.user?.id || null;
 
     try {
       const section = await prisma.section.create({
@@ -275,6 +284,8 @@ export const updateSection = async (req, res, next) => {
       description,
       content,
       category,
+      imageUrl: imageUrlBody,
+      documentUrl: documentUrlBody,
       videoUrl: videoUrlBody,
       link,
       fileType,
@@ -283,9 +294,9 @@ export const updateSection = async (req, res, next) => {
     } = req.body;
 
     const files = req.files || {};
-    const newImageUrl = files.image?.[0] ? `/uploads/${files.image[0].filename}` : undefined;
-    const newDocumentUrl = files.document?.[0] ? `/uploads/${files.document[0].filename}` : undefined;
-    const newVideoUrl = files.video?.[0] ? `/uploads/${files.video[0].filename}` : (videoUrlBody !== undefined ? videoUrlBody : undefined);
+    const newImageUrl = files.image?.[0] ? toUploadUrl(files.image[0]) : imageUrlBody;
+    const newDocumentUrl = files.document?.[0] ? toUploadUrl(files.document[0]) : documentUrlBody;
+    const newVideoUrl = files.video?.[0] ? toUploadUrl(files.video[0]) : videoUrlBody;
 
     const updateData = {};
     if (moduleVal !== undefined) updateData.module = moduleVal;

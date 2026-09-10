@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "employeeId": "EMP001",
+    "name": "Azimul Hassan",
+    "designation": "Assistant Cum Cashier",
+    "type": "Regular",
+    "department": "Establishment"
+  },
+  {
+    "id": 2,
+    "employeeId": "EMP002",
+    "name": "Binod Kumar",
+    "designation": "Sales Assistant",
+    "type": "Regular",
+    "department": "Sales"
+  },
+  {
+    "id": 3,
+    "employeeId": "EMP003",
+    "name": "Santosh Kumar",
+    "designation": "Dispatch",
+    "type": "Regular",
+    "department": "Dispatch"
+  },
+  {
+    "id": 4,
+    "employeeId": "EMP004",
+    "name": "Rajesh Hembrom",
+    "designation": "Security Encharge",
+    "type": "Regular",
+    "department": "Security"
+  },
+  {
+    "id": 5,
+    "employeeId": "EMP005",
+    "name": "Binod Kumar",
+    "designation": "Peon",
+    "type": "Regular",
+    "department": "MD Cell"
+  },
+  {
+    "id": 6,
+    "employeeId": "EMP006",
+    "name": "Rakesh Kumar",
+    "designation": "Account Assistant",
+    "type": "Contract",
+    "department": "Accounts"
+  },
+  {
+    "id": 7,
+    "employeeId": "EMP007",
+    "name": "Sukriti Kumari",
+    "designation": "Account Assistant",
+    "type": "Contract",
+    "department": "Accounts"
+  },
+  {
+    "id": 8,
+    "employeeId": "EMP008",
+    "name": "MD Ashad",
+    "designation": "Assistant",
+    "type": "Contract",
+    "department": "Accounts"
+  },
+  {
+    "id": 9,
+    "employeeId": "EMP009",
+    "name": "KN Rai",
+    "designation": "Assistant",
+    "type": "Contract",
+    "department": "Legal"
+  },
+  {
+    "id": 10,
+    "employeeId": "EMP010",
+    "name": "CK Yadav",
+    "designation": "Sales Assistant",
+    "type": "Contract",
+    "department": "Sales"
+  }
+]

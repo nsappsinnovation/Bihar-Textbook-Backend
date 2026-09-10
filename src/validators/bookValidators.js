@@ -1,4 +1,5 @@
 import { body } from "express-validator";
+import { isUrlOrPath } from "./common.js";
 
 export const createBookValidator = [
   body("title")
@@ -29,7 +30,7 @@ export const createBookValidator = [
   body("coverImageUrl")
     .optional({ checkFalsy: true })
     .trim()
-    .isURL()
+    .custom(isUrlOrPath)
     .withMessage("Cover image URL must be a valid URL")
     .isLength({ max: 500 })
     .withMessage("Cover image URL cannot exceed 500 characters"),
@@ -71,7 +72,7 @@ export const updateBookValidator = [
   body("coverImageUrl")
     .optional({ checkFalsy: true })
     .trim()
-    .isURL()
+    .custom(isUrlOrPath)
     .withMessage("Cover image URL must be a valid URL")
     .isLength({ max: 500 })
     .withMessage("Cover image URL cannot exceed 500 characters"),
@@ -100,10 +101,15 @@ export const createChapterValidator = [
     .withMessage("Chapter title is required")
     .isLength({ max: 255 })
     .withMessage("Chapter title cannot exceed 255 characters"),
+  body("hindiTitle")
+    .optional({ nullable: true })
+    .trim()
+    .isLength({ max: 255 })
+    .withMessage("Hindi title cannot exceed 255 characters"),
   body("pdfUrl")
     .optional({ checkFalsy: true })
     .trim()
-    .isURL()
+    .custom(isUrlOrPath)
     .withMessage("PDF URL must be a valid URL")
     .isLength({ max: 500 })
     .withMessage("PDF URL cannot exceed 500 characters"),
@@ -125,10 +131,15 @@ export const updateChapterValidator = [
     .withMessage("Chapter title cannot be empty")
     .isLength({ max: 255 })
     .withMessage("Chapter title cannot exceed 255 characters"),
+  body("hindiTitle")
+    .optional({ nullable: true })
+    .trim()
+    .isLength({ max: 255 })
+    .withMessage("Hindi title cannot exceed 255 characters"),
   body("pdfUrl")
     .optional({ checkFalsy: true })
     .trim()
-    .isURL()
+    .custom(isUrlOrPath)
     .withMessage("PDF URL must be a valid URL")
     .isLength({ max: 500 })
     .withMessage("PDF URL cannot exceed 500 characters"),
