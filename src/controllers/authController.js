@@ -22,6 +22,8 @@ export const signAndSetCookie = (res, admin) => {
     sameSite: isProd ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
+
+  return token;
 };
 
 // POST /api/auth/signup
@@ -121,13 +123,16 @@ export const login = async (req, res) => {
       },
     });
 
-    signAndSetCookie(res, admin);
+    const token = signAndSetCookie(res, admin);
 
     logger.info({ adminId: admin.id, email: admin.email }, "Admin logged in");
 
     return res.json({
       success: true,
       message: "Login successful",
+      // Also returned so the frontend can send it as "Authorization: Bearer <token>"
+      // when the browser blocks the cookie (site and API on different domains).
+      token,
       user: {
         id: admin.id,
         fullName: admin.fullName,
@@ -143,35 +148,16 @@ export const login = async (req, res) => {
   }
 };
 
-// GET /api/auth/me
-export const me = async (req, res) => {
-  try {
-    const token = req.cookies.token;
-
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: "Not authenticated",
-      });
-    }
-
-    const decoded = jwt.verify(token, env.JWT_SECRET);
-
-    res.json({
-      success: true,
-      user: {
-        id: decoded.id,
-        email: decoded.email,
-        fullName: decoded.fullName || "BTBP Admin",
-      },
-    });
-  } catch (error) {
-    logger.error({ err: error }, "Auth check error");
-    res.status(401).json({
-      success: false,
-      message: "Invalid token",
-    });
-  }
+// GET /api/auth/me — `authenticate` has already checked the cookie or Bearer token
+export const me = (req, res) => {
+  res.json({
+    success: true,
+    user: {
+      id: req.user.id,
+      email: req.user.email,
+      fullName: req.user.fullName || "BTBP Admin",
+    },
+  });
 };
 
 // POST /api/auth/logout
