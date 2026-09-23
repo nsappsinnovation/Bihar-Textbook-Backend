@@ -15,6 +15,13 @@ jobs:
         with:
           clean: false
 
+      - name: Preserve production files
+        shell: pwsh
+        run: |
+          Copy-Item "E:\Bihar-Textbook-Backend-main\.env" ".\.env" -Force
+          robocopy "E:\Bihar-Textbook-Backend-main\uploads" ".\uploads" /E
+          robocopy "E:\Bihar-Textbook-Backend-main\src\generated\prisma" ".\src\generated\prisma" /E
+
       - name: Stop PM2 application
         run: pm2 stop bihar-textbook-api
         continue-on-error: true
@@ -22,10 +29,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Generate Prisma Client
-        run: npx prisma generate
-
-      - name: Restart PM2 application
-        run: pm2 restart bihar-textbook-api
-
-        
+      - name: Start PM2 from runner checkout
+        shell: pwsh
+        run: |
+          pm2 delete bihar-textbook-api
+          pm2 start server.js --name bihar-textbook-api
+          pm2 save
