@@ -16,11 +16,19 @@ jobs:
           clean: false
 
       - name: Preserve production files
-        shell: pwsh
+        shell: powershell
         run: |
           Copy-Item "E:\Bihar-Textbook-Backend-main\.env" ".\.env" -Force
+
           robocopy "E:\Bihar-Textbook-Backend-main\uploads" ".\uploads" /E
+          if ($LASTEXITCODE -gt 7) {
+            exit $LASTEXITCODE
+          }
+
           robocopy "E:\Bihar-Textbook-Backend-main\src\generated\prisma" ".\src\generated\prisma" /E
+          if ($LASTEXITCODE -gt 7) {
+            exit $LASTEXITCODE
+          }
 
       - name: Stop PM2 application
         run: pm2 stop bihar-textbook-api
@@ -30,7 +38,7 @@ jobs:
         run: npm ci
 
       - name: Start PM2 from runner checkout
-        shell: pwsh
+        shell: powershell
         run: |
           pm2 delete bihar-textbook-api
           pm2 start server.js --name bihar-textbook-api
