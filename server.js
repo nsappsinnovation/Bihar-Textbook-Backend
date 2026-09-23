@@ -26,6 +26,7 @@ import settingRoutes from "./src/routes/settingRoutes.js";
 import directoryRoutes from "./src/routes/directoryRoutes.js";
 import activityRoutes from "./src/routes/activityRoutes.js";
 import dashboardRoutes from "./src/routes/dashboardRoutes.js";
+import testRoutes from "./src/routes/testRoutes.js";
 // import employees from "./src/routes/employeesRoutes.js"
 
 const app = express();
@@ -96,6 +97,7 @@ app.use("/api", settingRoutes);
 app.use("/api", directoryRoutes);
 app.use("/api", activityRoutes);
 app.use("/api", dashboardRoutes);
+app.use("/api", testRoutes);
 // app.use("/api/employee", employees)
 
 
