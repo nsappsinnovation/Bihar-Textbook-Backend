@@ -1,0 +1,273 @@
+// 
+
+// generator client {
+//   provider = "prisma-client-js"
+//   output   = "../src/generated/prisma"
+// }
+
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../src/generated/prisma"
+  binaryTargets = ["native", "windows"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id           Int      @id @default(autoincrement())
+  fullName     String   @map("full_name") @db.VarChar(200)
+  email        String   @unique @db.VarChar(255)
+  phone        String?  @db.VarChar(20)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  avatarUrl    String?  @map("avatar_url") @db.VarChar(500)
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+  extraText    String?  @map("extra_text") @db.Text // spare column for future use
+  extraNumber  Float?   @map("extra_number") // spare column for future use
+
+  books      Book[]
+  notices    Notice[]
+  sections   Section[]
+  settings   Setting[]
+  mdMessages ManagingDirectorMessage[]
+  activities ActivityLog[]
+
+  @@map("admins")
+}
+
+enum BookStatus {
+  Published
+  Draft
+}
+
+model Book {
+  id            Int        @id @default(autoincrement())
+  title         String     @db.VarChar(255)
+  classId       Int        @map("class_id") @db.TinyInt
+  subject       String?    @default("General") @db.VarChar(100)
+  board         String?    @default("Bihar Board") @db.VarChar(200)
+  coverImageUrl String?    @map("cover_image_url") @db.VarChar(500)
+  description   String?    @db.Text
+  status        BookStatus @default(Draft)
+  sortOrder     Int?       @default(0) @map("sort_order")
+  createdById   Int?       @map("created_by")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @default(now()) @updatedAt @map("updated_at")
+  extraText     String?    @map("extra_text") @db.Text // spare column for future use
+  extraNumber   Float?     @map("extra_number") // spare column for future use
+
+  createdBy Admin?        @relation(fields: [createdById], references: [id])
+  chapters  BookChapter[]
+
+  @@map("books")
+}
+
+model BookChapter {
+  id            Int      @id @default(autoincrement())
+  bookId        Int      @map("book_id")
+  chapterNumber Int      @map("chapter_number")
+  title         String?  @db.VarChar(255)
+  hindiTitle    String?  @map("hindi_title") @db.VarChar(255)
+  pdfUrl        String?  @map("pdf_url") @db.VarChar(500)
+  sortOrder     Int?     @default(0) @map("sort_order")
+  createdAt     DateTime @default(now()) @map("created_at")
+  extraText     String?  @map("extra_text") @db.Text // spare column for future use
+  extraNumber   Float?   @map("extra_number") // spare column for future use
+
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@map("book_chapters")
+}
+
+enum NoticeType {
+  Notice
+  Tender
+}
+
+model Notice {
+  id          Int        @id @default(autoincrement())
+  title       String     @db.VarChar(500)
+  description String?    @db.Text
+  type        NoticeType @default(Notice)
+  category    String?    @db.VarChar(100)
+  isPinned    Boolean?   @default(false) @map("is_pinned")
+  documentUrl String?    @map("document_url") @db.VarChar(500)
+  publishDate DateTime?  @map("publish_date") @db.Date
+  closingDate DateTime?  @map("closing_date") @db.Date
+  createdById Int?       @map("created_by")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @default(now()) @updatedAt @map("updated_at")
+  extraText   String?    @map("extra_text") @db.Text // spare column for future use
+  extraNumber Float?     @map("extra_number") // spare column for future use
+
+  createdBy Admin? @relation(fields: [createdById], references: [id])
+
+  @@index([type, closingDate])
+  @@map("notices")
+}
+
+enum EmployeeType {
+  Regular
+  Contract
+  Outsource
+}
+
+model ManagingDirector {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(255)
+  from        DateTime @db.Date
+  to          DateTime @db.Date
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+  extraText   String?  @map("extra_text") @db.Text // spare column for future use
+  extraNumber Float?   @map("extra_number") // spare column for future use
+
+  @@map("managing_directors")
+}
+
+model BoardDirector {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(255)
+  designation String   @db.VarChar(255)
+  since       String   @db.VarChar(50)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+  extraText   String?  @map("extra_text") @db.Text // spare column for future use
+  extraNumber Float?   @map("extra_number") // spare column for future use
+
+  @@map("board_directors")
+}
+
+model Employee {
+  id          Int          @id @default(autoincrement())
+  name        String       @db.VarChar(255)
+  designation String       @db.VarChar(255)
+  type        EmployeeType @default(Regular)
+  department  String       @db.VarChar(200)
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @default(now()) @updatedAt @map("updated_at")
+  extraText   String?      @map("extra_text") @db.Text // spare column for future use
+  extraNumber Float?       @map("extra_number") // spare column for future use
+
+  @@map("employees")
+}
+
+model ManagingDirectorMessage {
+  id            Int      @id @default(1)
+  name          String   @db.VarChar(255)
+  designation   String   @db.VarChar(255)
+  photoUrl      String?  @map("photo_url") @db.VarChar(500)
+  quote         String?  @db.Text
+  welcomeNote   String   @map("welcome_note") @db.Text
+  qualityNote   String?  @map("quality_note") @db.Text
+  collaboration String?  @db.Text
+  movingForward String?  @map("moving_forward") @db.Text
+  updatedById   Int?     @map("updated_by")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+  extraText     String?  @map("extra_text") @db.Text // spare column for future use
+  extraNumber   Float?   @map("extra_number") // spare column for future use
+
+  updatedBy Admin? @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@map("managing_director_messages")
+}
+
+model Section {
+  id          Int       @id @default(autoincrement())
+  module      String    @db.VarChar(50)
+  title       String    @db.VarChar(500)
+  description String?   @db.Text
+  content     String?   @db.Text
+  category    String?   @db.VarChar(100)
+  imageUrl    String?   @map("image_url") @db.VarChar(500)
+  videoUrl    String?   @map("video_url") @db.VarChar(500)
+  documentUrl String?   @map("document_url") @db.VarChar(500)
+  fileType    String?   @map("file_type") @db.VarChar(20)
+  link        String?   @db.VarChar(500)
+  publishDate DateTime? @map("publish_date") @db.Date
+  sortOrder   Int?      @default(0) @map("sort_order")
+  createdById Int?      @map("created_by")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
+  extraText   String?   @map("extra_text") @db.Text // spare column for future use
+  extraNumber Float?    @map("extra_number") // spare column for future use
+
+  createdBy Admin? @relation(fields: [createdById], references: [id])
+
+  @@map("sections")
+}
+
+model Setting {
+  id           Int      @id @default(autoincrement())
+  settingKey   String   @unique @map("setting_key") @db.VarChar(100)
+  settingValue String?  @map("setting_value") @db.LongText
+  category     String?  @db.VarChar(50)
+  updatedById  Int?     @map("updated_by")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+  extraText    String?  @map("extra_text") @db.Text // spare column for future use
+  extraNumber  Float?   @map("extra_number") // spare column for future use
+
+  updatedBy Admin? @relation(fields: [updatedById], references: [id])
+
+  @@map("settings")
+}
+
+model Directory {
+  id            Int      @id @default(autoincrement())
+  type          String   @db.VarChar(50)
+  name          String   @db.VarChar(255)
+  designation   String?  @db.VarChar(255)
+  department    String?  @db.VarChar(200)
+  tag           String?  @db.VarChar(50)
+  email         String?  @db.VarChar(255)
+  phone         String?  @db.VarChar(50)
+  photoUrl      String?  @map("photo_url") @db.VarChar(500)
+  tenureFrom    String?  @map("tenure_from") @db.VarChar(50)
+  tenureTo      String?  @map("tenure_to") @db.VarChar(50)
+  status        String?  @default("Active") @db.VarChar(20)
+  sortOrder     Int?     @default(0) @map("sort_order")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+  boardPosition String?  @map("board_position") @db.VarChar(255) // position in the board (board_member rows)
+  extraText     String?  @map("extra_text") @db.Text // spare column for future use
+  extraNumber   Float?   @map("extra_number") // spare column for future use
+
+  @@index([type])
+  @@map("directory")
+}
+
+// Admin panel activity feed (Notifications page, navbar bell, dashboard)
+model ActivityLog {
+  id          Int      @id @default(autoincrement())
+  action      String   @db.VarChar(500)
+  type        String   @default("system") @db.VarChar(20)
+  isRead      Boolean  @default(false) @map("is_read")
+  adminId     Int?     @map("admin_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  extraText   String?  @map("extra_text") @db.Text // spare column for future use
+  extraNumber Float?   @map("extra_number") // spare column for future use
+
+  admin Admin? @relation(fields: [adminId], references: [id], onDelete: SetNull)
+
+  @@map("activity_logs")
+}
+
+// Monthly textbook distribution vs target (dashboard chart, edited by admin)
+model BookDistribution {
+  id          Int      @id @default(autoincrement())
+  year        Int
+  month       Int      @db.TinyInt
+  distributed Int      @default(0)
+  target      Int      @default(0)
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+  extraText   String?  @map("extra_text") @db.Text // spare column for future use
+  extraNumber Float?   @map("extra_number") // spare column for future use
+
+  @@unique([year, month])
+  @@map("book_distributions")
+}

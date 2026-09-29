@@ -7,7 +7,7 @@ import {
   updateNotice,
 } from "../controllers/noticeController.js";
 import { authenticate } from "../middlewares/auth.js";
-import { uploadPdf } from "../middlewares/uploads.js";
+import { setUploadFolder, uploadPdf } from "../middlewares/uploads.js";
 import { validateRequest } from "../middlewares/validateRequest.js";
 import { createNoticeValidator, updateNoticeValidator } from "../validators/noticeValidators.js";
 
@@ -18,6 +18,8 @@ router.get("/:id", getNoticeById);
 router.post(
   "/",
   authenticate,
+  // Saved in notices/ first; the controller moves it to tenders/ or circulars/ once type/category are known
+  setUploadFolder("notices"),
   uploadPdf.single("document"),
   createNoticeValidator,
   validateRequest,
@@ -26,6 +28,8 @@ router.post(
 router.put(
   "/:id",
   authenticate,
+  // Saved in notices/ first; the controller moves it to tenders/ or circulars/ once type/category are known
+  setUploadFolder("notices"),
   uploadPdf.single("document"),
   updateNoticeValidator,
   validateRequest,

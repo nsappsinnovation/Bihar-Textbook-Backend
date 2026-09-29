@@ -10,6 +10,7 @@ import {
   uploadSingleImage,
   uploadSingleDocument,
   uploadSingleVideo,
+  setUploadFolder,
 } from "../middlewares/uploads.js";
 import { validateRequest } from "../middlewares/validateRequest.js";
 import { deleteUploadValidator } from "../validators/uploadValidators.js";
@@ -28,10 +29,17 @@ const router = express.Router();
  * /api/uploads/image:
  *   post:
  *     summary: Reusable image upload (Admin)
- *     description: Upload a single image file (JPG, PNG, WebP up to 2MB). Stores in /uploads/images/ and returns relative path.
+ *     description: Upload a single image file (JPG, PNG, WebP up to 2MB). Stores in uploads/{folder}/ and returns its /api/uploads/... path.
  *     tags: [Uploads]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: folder
+ *         schema:
+ *           type: string
+ *           example: notices
+ *         description: Subfolder under uploads/ (notices, circulars, tenders, books/covers, books/chapters, leaders, gallery/photos, ...). Defaults to "others".
  *     requestBody:
  *       required: true
  *       content:
@@ -52,17 +60,27 @@ const router = express.Router();
  *       413:
  *         description: File size exceeds 2MB limit
  */
-router.post("/uploads/image", authenticate, uploadSingleImage, uploadImage);
+// ?folder= picks the uploads/ subfolder (e.g. notices, tenders, books/covers); defaults to "others"
+const folderFromQuery = setUploadFolder((req) => req.query.folder);
+
+router.post("/uploads/image", authenticate, folderFromQuery, uploadSingleImage, uploadImage);
 
 /**
  * @swagger
  * /api/uploads/document:
  *   post:
  *     summary: Reusable document upload (Admin)
- *     description: Upload a single document file (PDF, DOC, DOCX up to 20MB). Stores in /uploads/documents/ and returns relative path.
+ *     description: Upload a single document file (PDF, DOC, DOCX up to 20MB). Stores in uploads/{folder}/ and returns its /api/uploads/... path.
  *     tags: [Uploads]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: folder
+ *         schema:
+ *           type: string
+ *           example: notices
+ *         description: Subfolder under uploads/ (notices, circulars, tenders, books/covers, books/chapters, leaders, gallery/photos, ...). Defaults to "others".
  *     requestBody:
  *       required: true
  *       content:
@@ -83,17 +101,24 @@ router.post("/uploads/image", authenticate, uploadSingleImage, uploadImage);
  *       413:
  *         description: File size exceeds 20MB limit
  */
-router.post("/uploads/document", authenticate, uploadSingleDocument, uploadDocument);
+router.post("/uploads/document", authenticate, folderFromQuery, uploadSingleDocument, uploadDocument);
 
 /**
  * @swagger
  * /api/uploads/video:
  *   post:
  *     summary: Reusable video upload (Admin)
- *     description: Upload a single video file (MP4 up to 50MB). Stores in /uploads/videos/ and returns relative path.
+ *     description: Upload a single video file (MP4 up to 50MB). Stores in uploads/{folder}/ and returns its /api/uploads/... path.
  *     tags: [Uploads]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: folder
+ *         schema:
+ *           type: string
+ *           example: notices
+ *         description: Subfolder under uploads/ (notices, circulars, tenders, books/covers, books/chapters, leaders, gallery/photos, ...). Defaults to "others".
  *     requestBody:
  *       required: true
  *       content:
@@ -114,7 +139,7 @@ router.post("/uploads/document", authenticate, uploadSingleDocument, uploadDocum
  *       413:
  *         description: File size exceeds 50MB limit
  */
-router.post("/uploads/video", authenticate, uploadSingleVideo, uploadVideo);
+router.post("/uploads/video", authenticate, folderFromQuery, uploadSingleVideo, uploadVideo);
 
 /**
  * @swagger
@@ -135,7 +160,7 @@ router.post("/uploads/video", authenticate, uploadSingleVideo, uploadVideo);
  *             properties:
  *               path:
  *                 type: string
- *                 example: /uploads/images/1725350000000-uuid.webp
+ *                 example: /api/uploads/notices/1725350000000-uuid.pdf
  *     responses:
  *       204:
  *         description: File deleted successfully

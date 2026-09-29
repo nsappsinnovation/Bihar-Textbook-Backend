@@ -1,7 +1,6 @@
 import { unlink } from "node:fs/promises";
-import path from "node:path";
 import prisma from "../config/db.js";
-import { UPLOADS_DIRECTORY } from "../middlewares/uploads.js";
+import { getLocalUploadPath, toUploadUrl } from "../middlewares/uploads.js";
 import logger from "../utils/logger.js";
 import { PUBLIC_ALLOWED_SETTING_KEYS } from "../validators/settingValidators.js";
 
@@ -29,10 +28,8 @@ const parseSettingValue = (value) => {
  * Safely removes a local file from disk
  */
 const removeLocalFile = async (fileUrl) => {
-  if (!fileUrl || typeof fileUrl !== "string" || !fileUrl.startsWith("/uploads/")) return;
-  const relativePath = fileUrl.slice("/uploads/".length);
-  const filepath = path.resolve(UPLOADS_DIRECTORY, relativePath);
-  if (!filepath.startsWith(`${UPLOADS_DIRECTORY}${path.sep}`)) return;
+  const filepath = getLocalUploadPath(fileUrl);
+  if (!filepath) return;
 
   try {
     await unlink(filepath);
@@ -202,7 +199,7 @@ export const uploadSettingFile = async (req, res, next) => {
       });
     }
 
-    const relativePath = `/uploads/documents/${file.filename}`;
+    const relativePath = toUploadUrl(file);
     const updatedById = req.user?.id || null;
 
     const existingSetting = await prisma.setting.findUnique({

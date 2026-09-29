@@ -4,6 +4,7 @@ import prisma from "../config/db.js";
 const EDITABLE_FIELDS = [
     "name",
     "designation",
+    "boardPosition",
     "department",
     "tag",
     "email",

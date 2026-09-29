@@ -333,7 +333,7 @@ export const getLandingPageHtml = (uptimeSeconds, dbConnected = false) => {
             </div>
         </div>
 
-        <a href="/api-docs" class="button" style="margin-bottom: 24px;">View Swagger API Documentation</a>
+        <a href="/api/docs" class="button" style="margin-bottom: 24px;">View Swagger API Documentation</a>
 
         <div class="dark-guide-box">
             <h2>Swagger Testing Guide</h2>

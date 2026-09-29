@@ -1,19 +1,13 @@
 import { unlink } from "node:fs/promises";
-import path from "node:path";
 import prisma from "../config/db.js";
-import { UPLOADS_DIRECTORY } from "../middlewares/uploads.js";
+import { getLocalUploadPath, toUploadUrl, uploadUrlVariants } from "../middlewares/uploads.js";
 import logger from "../utils/logger.js";
 
 /**
  * Helper to construct relative public URL from uploaded Multer file
  */
 const buildFileResponse = (file) => {
-  let subfolder = "";
-  if (file.destination.endsWith("images")) subfolder = "images/";
-  else if (file.destination.endsWith("documents")) subfolder = "documents/";
-  else if (file.destination.endsWith("videos")) subfolder = "videos/";
-
-  const relativePath = `/uploads/${subfolder}${file.filename}`;
+  const relativePath = toUploadUrl(file);
   return {
     path: relativePath,
     url: relativePath,
@@ -97,21 +91,19 @@ export const deleteUpload = async (req, res, next) => {
   try {
     const { path: reqPath } = req.body;
 
-    // Remove leading /uploads/ to resolve inside UPLOADS_DIRECTORY
-    const relativeSubPath = reqPath.replace(/^\/uploads\//, "");
-    const absolutePath = path.resolve(UPLOADS_DIRECTORY, relativeSubPath);
-
-    // Prevent path traversal outside configured upload root
-    if (!absolutePath.startsWith(`${UPLOADS_DIRECTORY}${path.sep}`) && absolutePath !== UPLOADS_DIRECTORY) {
+    // Resolve inside UPLOADS_DIRECTORY; null means path traversal outside the upload root
+    const absolutePath = getLocalUploadPath(reqPath);
+    if (!absolutePath) {
       return res.status(400).json({
         success: false,
         message: "Invalid file path or directory traversal attempt",
       });
     }
 
-    // Check all models in parallel for references to this path
+    // Check all models in parallel for references to this path (new "/api/uploads/" and legacy "/uploads/" forms)
+    const urls = uploadUrlVariants(reqPath);
     const mdMessagePromise = prisma.managingDirectorMessage
-      ? prisma.managingDirectorMessage.count({ where: { photoUrl: reqPath } })
+      ? prisma.managingDirectorMessage.count({ where: { photoUrl: { in: urls } } })
       : Promise.resolve(0);
 
     const [
@@ -123,23 +115,23 @@ export const deleteUpload = async (req, res, next) => {
       sectionRef,
       settingRef,
     ] = await Promise.all([
-      prisma.admin.count({ where: { avatarUrl: reqPath } }),
-      prisma.book.count({ where: { coverImageUrl: reqPath } }),
-      prisma.bookChapter.count({ where: { pdfUrl: reqPath } }),
-      prisma.notice.count({ where: { documentUrl: reqPath } }),
+      prisma.admin.count({ where: { avatarUrl: { in: urls } } }),
+      prisma.book.count({ where: { coverImageUrl: { in: urls } } }),
+      prisma.bookChapter.count({ where: { pdfUrl: { in: urls } } }),
+      prisma.notice.count({ where: { documentUrl: { in: urls } } }),
       mdMessagePromise,
       prisma.section.count({
         where: {
           OR: [
-            { imageUrl: reqPath },
-            { documentUrl: reqPath },
-            { videoUrl: reqPath },
+            { imageUrl: { in: urls } },
+            { documentUrl: { in: urls } },
+            { videoUrl: { in: urls } },
           ],
         },
       }),
       prisma.setting.count({
         where: {
-          settingValue: { contains: reqPath },
+          OR: urls.map((url) => ({ settingValue: { contains: url } })),
         },
       }),
     ]);

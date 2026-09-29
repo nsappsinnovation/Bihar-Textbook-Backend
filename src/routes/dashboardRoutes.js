@@ -30,7 +30,7 @@ const router = express.Router();
  *         schema: { type: integer, example: 2026 }
  * /api/admin/distribution/{year}:
  *   put:
- *     summary: Save distribution rows — body { months: [{ month, distributed, target }] }
+ *     summary: "Save distribution rows — body { months: [{ month, distributed, target }] }"
  *     tags: [Dashboard]
  */
 router.get("/admin/dashboard", authenticate, dashboardQueryValidator, validateRequest, getDashboard);

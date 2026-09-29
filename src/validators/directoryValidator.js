@@ -53,6 +53,12 @@ export const createDirectoryValidator = [
     .isLength({ max: 255 })
     .withMessage("Designation cannot exceed 255 characters"),
 
+  body("boardPosition")
+    .optional({ nullable: true })
+    .trim()
+    .isLength({ max: 255 })
+    .withMessage("Position in the board cannot exceed 255 characters"),
+
   body("department")
     .optional()
     .trim()
@@ -132,6 +138,12 @@ export const updateDirectoryValidator = [
     .trim()
     .isLength({ max: 255 })
     .withMessage("Designation cannot exceed 255 characters"),
+
+  body("boardPosition")
+    .optional({ nullable: true })
+    .trim()
+    .isLength({ max: 255 })
+    .withMessage("Position in the board cannot exceed 255 characters"),
 
   body("department")
     .optional()

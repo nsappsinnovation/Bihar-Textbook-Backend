@@ -7,8 +7,8 @@ export const deleteUploadValidator = [
     .isString()
     .trim()
     .custom((value) => {
-      if (!value.startsWith("/uploads/")) {
-        throw new Error("path must start with /uploads/");
+      if (!value.startsWith("/api/uploads/") && !value.startsWith("/uploads/")) {
+        throw new Error("path must start with /api/uploads/");
       }
       if (value.includes("..")) {
         throw new Error("Directory traversal is not allowed");

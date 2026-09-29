@@ -26,13 +26,15 @@ model Admin {
   isActive     Boolean  @default(true) @map("is_active")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+  extraText    String?  @map("extra_text") @db.Text // spare column for future use
+  extraNumber  Float?   @map("extra_number") // spare column for future use
 
-  books                  Book[]
-  notices                Notice[]
-  sections               Section[]
-  settings               Setting[]
-  mdMessages             ManagingDirectorMessage[]
-  activities             ActivityLog[]
+  books      Book[]
+  notices    Notice[]
+  sections   Section[]
+  settings   Setting[]
+  mdMessages ManagingDirectorMessage[]
+  activities ActivityLog[]
 
   @@map("admins")
 }
@@ -55,6 +57,8 @@ model Book {
   createdById   Int?       @map("created_by")
   createdAt     DateTime   @default(now()) @map("created_at")
   updatedAt     DateTime   @default(now()) @updatedAt @map("updated_at")
+  extraText     String?    @map("extra_text") @db.Text // spare column for future use
+  extraNumber   Float?     @map("extra_number") // spare column for future use
 
   createdBy Admin?        @relation(fields: [createdById], references: [id])
   chapters  BookChapter[]
@@ -71,6 +75,8 @@ model BookChapter {
   pdfUrl        String?  @map("pdf_url") @db.VarChar(500)
   sortOrder     Int?     @default(0) @map("sort_order")
   createdAt     DateTime @default(now()) @map("created_at")
+  extraText     String?  @map("extra_text") @db.Text // spare column for future use
+  extraNumber   Float?   @map("extra_number") // spare column for future use
 
   book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
 
@@ -83,20 +89,24 @@ enum NoticeType {
 }
 
 model Notice {
-  id          Int         @id @default(autoincrement())
-  title       String      @db.VarChar(500)
-  description String?     @db.Text
-  type        NoticeType  @default(Notice)
-  category    String?     @db.VarChar(100)
-  isPinned    Boolean?    @default(false) @map("is_pinned")
-  documentUrl String?     @map("document_url") @db.VarChar(500)
-  publishDate DateTime?   @db.Date @map("publish_date")
-  createdById Int?        @map("created_by")
-  createdAt   DateTime    @default(now()) @map("created_at")
-  updatedAt   DateTime    @default(now()) @updatedAt @map("updated_at")
+  id          Int        @id @default(autoincrement())
+  title       String     @db.VarChar(500)
+  description String?    @db.Text
+  type        NoticeType @default(Notice)
+  category    String?    @db.VarChar(100)
+  isPinned    Boolean?   @default(false) @map("is_pinned")
+  documentUrl String?    @map("document_url") @db.VarChar(500)
+  publishDate DateTime?  @map("publish_date") @db.Date
+  closingDate DateTime?  @map("closing_date") @db.Date
+  createdById Int?       @map("created_by")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @default(now()) @updatedAt @map("updated_at")
+  extraText   String?    @map("extra_text") @db.Text // spare column for future use
+  extraNumber Float?     @map("extra_number") // spare column for future use
 
   createdBy Admin? @relation(fields: [createdById], references: [id])
 
+  @@index([type, closingDate])
   @@map("notices")
 }
 
@@ -107,12 +117,14 @@ enum EmployeeType {
 }
 
 model ManagingDirector {
-  id        Int      @id @default(autoincrement())
-  name      String   @db.VarChar(255)
-  from      DateTime @db.Date
-  to        DateTime @db.Date
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(255)
+  from        DateTime @db.Date
+  to          DateTime @db.Date
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+  extraText   String?  @map("extra_text") @db.Text // spare column for future use
+  extraNumber Float?   @map("extra_number") // spare column for future use
 
   @@map("managing_directors")
 }
@@ -124,6 +136,8 @@ model BoardDirector {
   since       String   @db.VarChar(50)
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+  extraText   String?  @map("extra_text") @db.Text // spare column for future use
+  extraNumber Float?   @map("extra_number") // spare column for future use
 
   @@map("board_directors")
 }
@@ -136,6 +150,8 @@ model Employee {
   department  String       @db.VarChar(200)
   createdAt   DateTime     @default(now()) @map("created_at")
   updatedAt   DateTime     @default(now()) @updatedAt @map("updated_at")
+  extraText   String?      @map("extra_text") @db.Text // spare column for future use
+  extraNumber Float?       @map("extra_number") // spare column for future use
 
   @@map("employees")
 }
@@ -153,6 +169,8 @@ model ManagingDirectorMessage {
   updatedById   Int?     @map("updated_by")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+  extraText     String?  @map("extra_text") @db.Text // spare column for future use
+  extraNumber   Float?   @map("extra_number") // spare column for future use
 
   updatedBy Admin? @relation(fields: [updatedById], references: [id], onDelete: SetNull)
 
@@ -160,22 +178,24 @@ model ManagingDirectorMessage {
 }
 
 model Section {
-  id           Int       @id @default(autoincrement())
-  module       String    @db.VarChar(50)
-  title        String    @db.VarChar(500)
-  description  String?   @db.Text
-  content      String?   @db.Text
-  category     String?   @db.VarChar(100)
-  imageUrl     String?   @map("image_url") @db.VarChar(500)
-  videoUrl     String?   @map("video_url") @db.VarChar(500)
-  documentUrl  String?   @map("document_url") @db.VarChar(500)
-  fileType     String?   @map("file_type") @db.VarChar(20)
-  link         String?   @db.VarChar(500)
-  publishDate  DateTime? @db.Date @map("publish_date")
-  sortOrder    Int?      @default(0) @map("sort_order")
-  createdById  Int?      @map("created_by")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at")
+  id          Int       @id @default(autoincrement())
+  module      String    @db.VarChar(50)
+  title       String    @db.VarChar(500)
+  description String?   @db.Text
+  content     String?   @db.Text
+  category    String?   @db.VarChar(100)
+  imageUrl    String?   @map("image_url") @db.VarChar(500)
+  videoUrl    String?   @map("video_url") @db.VarChar(500)
+  documentUrl String?   @map("document_url") @db.VarChar(500)
+  fileType    String?   @map("file_type") @db.VarChar(20)
+  link        String?   @db.VarChar(500)
+  publishDate DateTime? @map("publish_date") @db.Date
+  sortOrder   Int?      @default(0) @map("sort_order")
+  createdById Int?      @map("created_by")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
+  extraText   String?   @map("extra_text") @db.Text // spare column for future use
+  extraNumber Float?    @map("extra_number") // spare column for future use
 
   createdBy Admin? @relation(fields: [createdById], references: [id])
 
@@ -183,12 +203,14 @@ model Section {
 }
 
 model Setting {
-  id           Int       @id @default(autoincrement())
-  settingKey   String    @unique @map("setting_key") @db.VarChar(100)
-  settingValue String?   @map("setting_value") @db.LongText
-  category     String?   @db.VarChar(50)
-  updatedById  Int?      @map("updated_by")
-  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at")
+  id           Int      @id @default(autoincrement())
+  settingKey   String   @unique @map("setting_key") @db.VarChar(100)
+  settingValue String?  @map("setting_value") @db.LongText
+  category     String?  @db.VarChar(50)
+  updatedById  Int?     @map("updated_by")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+  extraText    String?  @map("extra_text") @db.Text // spare column for future use
+  extraNumber  Float?   @map("extra_number") // spare column for future use
 
   updatedBy Admin? @relation(fields: [updatedById], references: [id])
 
@@ -196,21 +218,24 @@ model Setting {
 }
 
 model Directory {
-  id          Int      @id @default(autoincrement())
-  type        String   @db.VarChar(50)
-  name        String   @db.VarChar(255)
-  designation String?  @db.VarChar(255)
-  department  String?  @db.VarChar(200)
-  tag         String?  @db.VarChar(50)
-  email       String?  @db.VarChar(255)
-  phone       String?  @db.VarChar(50)
-  photoUrl    String?  @map("photo_url") @db.VarChar(500)
-  tenureFrom  String?  @map("tenure_from") @db.VarChar(50)
-  tenureTo    String?  @map("tenure_to") @db.VarChar(50)
-  status      String?  @default("Active") @db.VarChar(20)
-  sortOrder   Int?     @default(0) @map("sort_order")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+  id            Int      @id @default(autoincrement())
+  type          String   @db.VarChar(50)
+  name          String   @db.VarChar(255)
+  designation   String?  @db.VarChar(255)
+  department    String?  @db.VarChar(200)
+  tag           String?  @db.VarChar(50)
+  email         String?  @db.VarChar(255)
+  phone         String?  @db.VarChar(50)
+  photoUrl      String?  @map("photo_url") @db.VarChar(500)
+  tenureFrom    String?  @map("tenure_from") @db.VarChar(50)
+  tenureTo      String?  @map("tenure_to") @db.VarChar(50)
+  status        String?  @default("Active") @db.VarChar(20)
+  sortOrder     Int?     @default(0) @map("sort_order")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+  boardPosition String?  @map("board_position") @db.VarChar(255) // position in the board (board_member rows)
+  extraText     String?  @map("extra_text") @db.Text // spare column for future use
+  extraNumber   Float?   @map("extra_number") // spare column for future use
 
   @@index([type])
   @@map("directory")
@@ -218,12 +243,14 @@ model Directory {
 
 // Admin panel activity feed (Notifications page, navbar bell, dashboard)
 model ActivityLog {
-  id        Int      @id @default(autoincrement())
-  action    String   @db.VarChar(500)
-  type      String   @default("system") @db.VarChar(20)
-  isRead    Boolean  @default(false) @map("is_read")
-  adminId   Int?     @map("admin_id")
-  createdAt DateTime @default(now()) @map("created_at")
+  id          Int      @id @default(autoincrement())
+  action      String   @db.VarChar(500)
+  type        String   @default("system") @db.VarChar(20)
+  isRead      Boolean  @default(false) @map("is_read")
+  adminId     Int?     @map("admin_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  extraText   String?  @map("extra_text") @db.Text // spare column for future use
+  extraNumber Float?   @map("extra_number") // spare column for future use
 
   admin Admin? @relation(fields: [adminId], references: [id], onDelete: SetNull)
 
@@ -238,6 +265,8 @@ model BookDistribution {
   distributed Int      @default(0)
   target      Int      @default(0)
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+  extraText   String?  @map("extra_text") @db.Text // spare column for future use
+  extraNumber Float?   @map("extra_number") // spare column for future use
 
   @@unique([year, month])
   @@map("book_distributions")
