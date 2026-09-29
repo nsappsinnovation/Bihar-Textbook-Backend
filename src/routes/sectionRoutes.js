@@ -8,7 +8,7 @@ import {
   reorderSections,
 } from "../controllers/sectionController.js";
 import { authenticate } from "../middlewares/auth.js";
-import { uploadSectionFiles } from "../middlewares/uploads.js";
+import { setUploadFolder, uploadSectionFiles } from "../middlewares/uploads.js";
 import { validateRequest } from "../middlewares/validateRequest.js";
 import {
   getSectionsQueryValidator,
@@ -211,6 +211,8 @@ router.post(
 router.post(
   "/admin/sections",
   authenticate,
+  // Saved in others/ first; the controller moves files to the section module's folder
+  setUploadFolder(),
   uploadSectionFiles,
   createSectionValidator,
   validateRequest,
@@ -281,6 +283,8 @@ router.post(
 router.patch(
   "/admin/sections/:id",
   authenticate,
+  // Saved in others/ first; the controller moves files to the section module's folder
+  setUploadFolder(),
   uploadSectionFiles,
   updateSectionValidator,
   validateRequest,

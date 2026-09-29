@@ -7,7 +7,7 @@ import {
   deleteSettingFile,
 } from "../controllers/settingController.js";
 import { authenticate } from "../middlewares/auth.js";
-import { uploadSingleDocument } from "../middlewares/uploads.js";
+import { SETTING_UPLOAD_FOLDERS, setUploadFolder, uploadSingleDocument } from "../middlewares/uploads.js";
 import { validateRequest } from "../middlewares/validateRequest.js";
 import {
   getSettingsQueryValidator,
@@ -156,6 +156,7 @@ router.post(
   authenticate,
   fileSettingKeyValidator,
   validateRequest,
+  setUploadFolder((req) => SETTING_UPLOAD_FOLDERS[req.params.key]),
   uploadSingleDocument,
   uploadSettingFile
 );

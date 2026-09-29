@@ -9,6 +9,8 @@ CREATE TABLE `admins` (
     `is_active` BOOLEAN NOT NULL DEFAULT true,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `extra_text` TEXT NULL,
+    `extra_number` DOUBLE NULL,
 
     UNIQUE INDEX `admins_email_key`(`email`),
     PRIMARY KEY (`id`)
@@ -28,6 +30,8 @@ CREATE TABLE `books` (
     `created_by` INTEGER NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `extra_text` TEXT NULL,
+    `extra_number` DOUBLE NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -42,6 +46,8 @@ CREATE TABLE `book_chapters` (
     `pdf_url` VARCHAR(500) NULL,
     `sort_order` INTEGER NULL DEFAULT 0,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `extra_text` TEXT NULL,
+    `extra_number` DOUBLE NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -56,10 +62,14 @@ CREATE TABLE `notices` (
     `is_pinned` BOOLEAN NULL DEFAULT false,
     `document_url` VARCHAR(500) NULL,
     `publish_date` DATE NULL,
+    `closing_date` DATE NULL,
     `created_by` INTEGER NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `extra_text` TEXT NULL,
+    `extra_number` DOUBLE NULL,
 
+    INDEX `notices_type_closing_date_idx`(`type`, `closing_date`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -71,6 +81,8 @@ CREATE TABLE `managing_directors` (
     `to` DATE NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `extra_text` TEXT NULL,
+    `extra_number` DOUBLE NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -83,6 +95,8 @@ CREATE TABLE `board_directors` (
     `since` VARCHAR(50) NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `extra_text` TEXT NULL,
+    `extra_number` DOUBLE NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -96,6 +110,8 @@ CREATE TABLE `employees` (
     `department` VARCHAR(200) NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `extra_text` TEXT NULL,
+    `extra_number` DOUBLE NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -114,6 +130,8 @@ CREATE TABLE `managing_director_messages` (
     `updated_by` INTEGER NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `extra_text` TEXT NULL,
+    `extra_number` DOUBLE NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -136,6 +154,8 @@ CREATE TABLE `sections` (
     `created_by` INTEGER NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `extra_text` TEXT NULL,
+    `extra_number` DOUBLE NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -148,6 +168,8 @@ CREATE TABLE `settings` (
     `category` VARCHAR(50) NULL,
     `updated_by` INTEGER NULL,
     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `extra_text` TEXT NULL,
+    `extra_number` DOUBLE NULL,
 
     UNIQUE INDEX `settings_setting_key_key`(`setting_key`),
     PRIMARY KEY (`id`)
@@ -170,6 +192,9 @@ CREATE TABLE `directory` (
     `sort_order` INTEGER NULL DEFAULT 0,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `board_position` VARCHAR(255) NULL,
+    `extra_text` TEXT NULL,
+    `extra_number` DOUBLE NULL,
 
     INDEX `directory_type_idx`(`type`),
     PRIMARY KEY (`id`)
@@ -183,6 +208,8 @@ CREATE TABLE `activity_logs` (
     `is_read` BOOLEAN NOT NULL DEFAULT false,
     `admin_id` INTEGER NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `extra_text` TEXT NULL,
+    `extra_number` DOUBLE NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -195,6 +222,8 @@ CREATE TABLE `book_distributions` (
     `distributed` INTEGER NOT NULL DEFAULT 0,
     `target` INTEGER NOT NULL DEFAULT 0,
     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `extra_text` TEXT NULL,
+    `extra_number` DOUBLE NULL,
 
     UNIQUE INDEX `book_distributions_year_month_key`(`year`, `month`),
     PRIMARY KEY (`id`)

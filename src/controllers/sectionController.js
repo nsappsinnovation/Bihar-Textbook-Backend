@@ -1,7 +1,6 @@
 import { unlink } from "node:fs/promises";
-import path from "node:path";
 import prisma from "../config/db.js";
-import { UPLOADS_DIRECTORY } from "../middlewares/uploads.js";
+import { SECTION_UPLOAD_FOLDERS, getLocalUploadPath, moveUploadedFile, toUploadUrl } from "../middlewares/uploads.js";
 import logger from "../utils/logger.js";
 import { ALLOWED_SECTION_MODULES } from "../validators/sectionValidators.js";
 
@@ -10,28 +9,10 @@ const createdBySelect = {
 };
 
 /**
- * Resolves safe local filesystem path for files uploaded under /uploads/
- */
-const getLocalFilePath = (fileUrl) => {
-  if (!fileUrl || typeof fileUrl !== "string" || !fileUrl.startsWith("/uploads/")) {
-    return null;
-  }
-  const relativePath = fileUrl.slice("/uploads/".length);
-  const filepath = path.resolve(UPLOADS_DIRECTORY, relativePath);
-  return filepath.startsWith(`${UPLOADS_DIRECTORY}${path.sep}`) ? filepath : null;
-};
-
-/**
- * Public URL for a file saved by multer, e.g. "/uploads/images/123-abc.webp"
- */
-const toUploadUrl = (file) =>
-  `/uploads/${path.relative(UPLOADS_DIRECTORY, file.path).split(path.sep).join("/")}`;
-
-/**
  * Safely removes a local file from disk
  */
 const removeLocalFile = async (fileUrl) => {
-  const filepath = getLocalFilePath(fileUrl);
+  const filepath = getLocalUploadPath(fileUrl);
   if (!filepath) return;
 
   try {
@@ -40,6 +21,17 @@ const removeLocalFile = async (fileUrl) => {
     if (error.code !== "ENOENT") {
       logger.warn({ err: error, filepath }, "Could not remove uploaded section file");
     }
+  }
+};
+
+/**
+ * Moves files uploaded with the request into the section module's folder (e.g. gallery/photos)
+ */
+const moveReqFilesToModuleFolder = async (files, module) => {
+  const folder = SECTION_UPLOAD_FOLDERS[module];
+  if (!files || !folder) return;
+  for (const file of [...(files.image || []), ...(files.document || []), ...(files.video || [])]) {
+    await moveUploadedFile(file, folder);
   }
 };
 
@@ -212,6 +204,7 @@ export const createSection = async (req, res, next) => {
 
     // An uploaded file wins; otherwise use a URL sent in the body (e.g. from POST /api/uploads/*)
     const files = req.files || {};
+    await moveReqFilesToModuleFolder(files, moduleVal);
     const imageUrl = files.image?.[0] ? toUploadUrl(files.image[0]) : (imageUrlBody || null);
     const documentUrl = files.document?.[0] ? toUploadUrl(files.document[0]) : (documentUrlBody || null);
     const videoUrl = files.video?.[0] ? toUploadUrl(files.video[0]) : (videoUrlBody || null);
@@ -294,6 +287,7 @@ export const updateSection = async (req, res, next) => {
     } = req.body;
 
     const files = req.files || {};
+    await moveReqFilesToModuleFolder(files, moduleVal ?? existingSection.module);
     const newImageUrl = files.image?.[0] ? toUploadUrl(files.image[0]) : imageUrlBody;
     const newDocumentUrl = files.document?.[0] ? toUploadUrl(files.document[0]) : documentUrlBody;
     const newVideoUrl = files.video?.[0] ? toUploadUrl(files.video[0]) : videoUrlBody;

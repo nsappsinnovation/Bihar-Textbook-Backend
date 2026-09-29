@@ -146,7 +146,7 @@ Stores the HTML and CSS for the root route (`/`) landing page. It displays a cle
 | **ora** | Displays a loading spinner animation in the terminal while the server is connecting to the database during startup. |
 | **mysql2** | The underlying MySQL driver that Prisma uses internally to communicate with our Aiven Cloud MySQL database. |
 | **swagger-jsdoc** | Generates Swagger/OpenAPI documentation from JSDoc comments in our route files. |
-| **swagger-ui-express** | Serves an interactive Swagger UI page at `/api-docs` where developers can browse and test all API endpoints directly in the browser. |
+| **swagger-ui-express** | Serves an interactive Swagger UI page at `/api/docs` where developers can browse and test all API endpoints directly in the browser. |
 | **zod** | A schema validation library. Available for use in future endpoints where we may need programmatic (non-middleware) validation. |
 | **nodemon** | Automatically restarts the server whenever a file changes during development. Saves us from manually stopping and restarting after every code edit. |
 
@@ -169,4 +169,4 @@ Stores the HTML and CSS for the root route (`/`) landing page. It displays a cle
 
 ## API Documentation
 
-Swagger API documentation is integrated into the project. When the server is running, you can access the interactive API documentation at the `/api-docs` route.
+Swagger API documentation is integrated into the project. When the server is running, you can access the interactive API documentation at the `/api/docs` route.

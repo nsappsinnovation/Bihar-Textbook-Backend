@@ -42,6 +42,16 @@ const noticeFields = ({ requireTitle }) => [
     .optional({ checkFalsy: true })
     .isISO8601({ strict: true })
     .withMessage("Publish date must be a valid ISO date"),
+  body("closingDate")
+    .optional({ checkFalsy: true })
+    .isISO8601({ strict: true })
+    .withMessage("Closing date must be a valid ISO date")
+    .custom((value, { req }) => {
+      if (req.body.publishDate && value.slice(0, 10) < req.body.publishDate.slice(0, 10)) {
+        throw new Error("Closing date cannot be before the publish date");
+      }
+      return true;
+    }),
   body().custom((value, { req }) => {
     if (req.file && value.documentUrl) {
       throw new Error("Provide either a PDF file or documentUrl, not both");
