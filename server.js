@@ -27,6 +27,7 @@ import directoryRoutes from "./src/routes/directoryRoutes.js";
 import activityRoutes from "./src/routes/activityRoutes.js";
 import dashboardRoutes from "./src/routes/dashboardRoutes.js";
 import testRoutes from "./src/routes/testRoutes.js";
+import visitRoutes from "./src/routes/visitRoutes.js";
 // import employees from "./src/routes/employeesRoutes.js"
 
 const app = express();
@@ -106,6 +107,7 @@ app.use("/api", directoryRoutes);
 app.use("/api", activityRoutes);
 app.use("/api", dashboardRoutes);
 app.use("/api", testRoutes);
+app.use("/api", visitRoutes);
 // app.use("/api/employee", employees)
 
 // Unknown /api routes get a JSON 404 instead of Express's HTML page

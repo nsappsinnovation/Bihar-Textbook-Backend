@@ -271,3 +271,21 @@ model BookDistribution {
   @@unique([year, month])
   @@map("book_distributions")
 }
+
+
+// One row per recorded page visit, for the Books section (a chapter's reader page) and the
+// 8 Learning Playground features (VR Lab, Audio Library, ...). section/itemKey/device are
+// plain strings grouped at query time, so nothing here needs to stay in sync with the Book
+// or Directory tables.
+model PageVisit {
+  id        Int      @id @default(autoincrement())
+  section   String   @db.VarChar(20) // "book" | "playground"
+  itemKey   String   @map("item_key") @db.VarChar(255) // book: "<classId>:<subject>", e.g. "2:ganit" · playground: the route, e.g. "/vr-dashboard"
+  device    String   @db.VarChar(20) // "phone" | "tablet" | "desktop"
+  visitorId String   @map("visitor_id") @db.VarChar(100) // random id the frontend sets in localStorage on first visit, reused after
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([section, itemKey])
+  @@index([createdAt])
+  @@map("page_visits")
+}
